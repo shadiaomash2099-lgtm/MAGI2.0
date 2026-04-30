@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* ============================================================
+   MAGI2.0 — 全局样式
+   规则 R15: CSS 变量集中定义
+   规则 R16: 组件动画使用 CSS Modules，不污染全局
+   ============================================================ */
+
+/* ─── 主题变量 ─────────────────────────────────────────── */
+:root {
+  --color-magi-amber: #ffb400;
+  --color-magi-green: #00ff41;
+  --color-magi-cyan: #00bfff;
+  --color-magi-gold: #ffd700;
+  --color-magi-lime: #32cd32;
+  --color-magi-red: #ff3333;
+}
+
+/* ─── 全局基础 ─────────────────────────────────────────── */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a0a;
+  color: #c0c0c0;
+  font-family: "Courier New", Courier, monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── 自定义滚动条 ─────────────────────────────────────── */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 180, 0, 0.2);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 180, 0, 0.4);
+}
+
+/* ─── 选择文本颜色 ─────────────────────────────────────── */
+::selection {
+  background: rgba(255, 180, 0, 0.3);
+  color: #fff;
+}
+
+/* ─── Markdown 渲染样式 ─────────────────────────────────── */
+.prose-magi {
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.prose-magi p {
+  margin: 0 0 4px;
+}
+
+.prose-magi ul,
+.prose-magi ol {
+  margin: 2px 0;
+  padding-left: 12px;
+}
+
+.prose-magi li {
+  margin: 1px 0;
+}
+
+.prose-magi strong {
+  color: #ffb400;
+}
+
+.prose-magi code {
+  background: rgba(255, 180, 0, 0.1);
+  padding: 0 3px;
+  border-radius: 2px;
+  font-size: 8px;
+}
