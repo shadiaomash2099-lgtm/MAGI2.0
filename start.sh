@@ -22,6 +22,44 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# --------------------------------------------------
+# 辅助函数：释放指定端口
+# --------------------------------------------------
+free_port() {
+    local port=$1
+    local pids
+    pids=$(lsof -ti :"$port" 2>/dev/null || true)
+    if [ -n "$pids" ]; then
+        echo -e "${YELLOW}  ⚡ 端口 $port 被占用，正在释放...${NC}"
+        kill -9 $pids 2>/dev/null || true
+        sleep 1
+        echo -e "${GREEN}  ✔ 端口 $port 已释放${NC}"
+    fi
+}
+
+# --------------------------------------------------
+# 辅助函数：等待端口就绪
+# --------------------------------------------------
+wait_for_port() {
+    local port=$1
+    local label=$2
+    local timeout=$3
+    local url=${4:-"http://localhost:$port"}
+    echo -n "  ⏳ 等待 $label 就绪"
+    for i in $(seq 1 "$timeout"); do
+        if curl -s "$url" > /dev/null 2>&1; then
+            echo ""
+            echo -e "${GREEN}  ✔ $label 已启动 → $url${NC}"
+            return 0
+        fi
+        echo -n "."
+        sleep 1
+    done
+    echo ""
+    echo -e "${RED}  ✖ $label 启动超时${NC}"
+    return 1
+}
+
 # 清理函数：停止所有后台进程
 cleanup() {
     echo ""
@@ -48,9 +86,9 @@ echo -e "${RED}============================================${NC}"
 echo ""
 
 # --------------------------------------------------
-# 1. 检查 Python 环境
+# 1. 检查运行环境
 # --------------------------------------------------
-echo -e "${YELLOW}[1/4] 检查运行环境...${NC}"
+echo -e "${YELLOW}[1/5] 检查运行环境...${NC}"
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}  ✖ 未找到 python3，请安装 Python 3.10+${NC}"
     exit 1
@@ -66,7 +104,7 @@ echo -e "${GREEN}  ✔ Node $(node --version)${NC}"
 # --------------------------------------------------
 # 2. 检查依赖
 # --------------------------------------------------
-echo -e "${YELLOW}[2/4] 检查依赖...${NC}"
+echo -e "${YELLOW}[2/5] 检查依赖...${NC}"
 
 # 后端依赖
 if [ ! -d "$BACKEND_DIR/venv" ]; then
@@ -88,55 +126,34 @@ fi
 echo -e "${GREEN}  ✔ 前端依赖就绪${NC}"
 
 # --------------------------------------------------
-# 3. 启动后端
+# 3. 释放端口
 # --------------------------------------------------
-echo -e "${YELLOW}[3/4] 启动后端服务...${NC}"
+echo -e "${YELLOW}[3/5] 检查端口占用...${NC}"
+free_port "$BACKEND_PORT"
+free_port "$FRONTEND_PORT"
+
+# --------------------------------------------------
+# 4. 启动后端
+# --------------------------------------------------
+echo -e "${YELLOW}[4/5] 启动后端服务...${NC}"
 cd "$BACKEND_DIR"
 source "$BACKEND_DIR/venv/bin/activate"
 uvicorn main:app --host 0.0.0.0 --port "$BACKEND_PORT" --reload --log-level warning &
 BACKEND_PID=$!
 
 # 等待后端就绪
-echo -n "  ⏳ 等待后端就绪"
-for i in $(seq 1 30); do
-    if curl -s "http://localhost:$BACKEND_PORT/docs" > /dev/null 2>&1; then
-        echo ""
-        echo -e "${GREEN}  ✔ 后端已启动 → http://localhost:$BACKEND_PORT${NC}"
-        break
-    fi
-    echo -n "."
-    sleep 1
-done
-if ! curl -s "http://localhost:$BACKEND_PORT/docs" > /dev/null 2>&1; then
-    echo ""
-    echo -e "${RED}  ✖ 后端启动超时${NC}"
-    exit 1
-fi
+wait_for_port "$BACKEND_PORT" "后端" 30 "http://localhost:$BACKEND_PORT/docs" || exit 1
 
 # --------------------------------------------------
-# 4. 启动前端 + 打开浏览器
+# 5. 启动前端 + 打开浏览器
 # --------------------------------------------------
-echo -e "${YELLOW}[4/4] 启动前端服务...${NC}"
+echo -e "${YELLOW}[5/5] 启动前端服务...${NC}"
 cd "$FRONTEND_DIR"
 npm run dev &
 FRONTEND_PID=$!
 
 # 等待前端就绪
-echo -n "  ⏳ 等待前端就绪"
-for i in $(seq 1 60); do
-    if curl -s "http://localhost:$FRONTEND_PORT" > /dev/null 2>&1; then
-        echo ""
-        echo -e "${GREEN}  ✔ 前端已启动 → http://localhost:$FRONTEND_PORT${NC}"
-        break
-    fi
-    echo -n "."
-    sleep 1
-done
-if ! curl -s "http://localhost:$FRONTEND_PORT" > /dev/null 2>&1; then
-    echo ""
-    echo -e "${RED}  ✖ 前端启动超时${NC}"
-    exit 1
-fi
+wait_for_port "$FRONTEND_PORT" "前端" 60 || exit 1
 
 # --------------------------------------------------
 # 5. 打开浏览器
