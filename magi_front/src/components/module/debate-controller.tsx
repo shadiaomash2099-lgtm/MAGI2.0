@@ -4,14 +4,20 @@
 // 规则 R11: API 层为纯函数，不直接操作 UI 状态
 // 规则 R14: useCallback 包裹回调函数
 // 规则 R5: 每个文件 ≤ 200 行
+//
+// 处理后端 4 种 SSE 事件类型:
+//   sys    → 添加系统日志
+//   start  → 切换发言人 + 创建新日志条目
+//   chunk  → 追加发言内容 + 更新最后一条日志
+//   verdict → 更新贤人表态
 // ============================================================
 
 "use client";
 
 import { useCallback, useRef } from "react";
 import { useDebateStore } from "@/store/debate-store";
-import { streamDebate, fetchSummary } from "@/lib/api";
-import type { MagiRole, StreamChunk } from "@/types";
+import { streamDebate, fetchSummary, fetchUnitSummary } from "@/lib/api";
+import type { MagiRole, SseData, Verdict } from "@/types";
 
 /**
  * 辩论控制器 Hook
@@ -31,42 +37,121 @@ export function useDebateController() {
     appendUnitContent,
     setUnitStatus,
     setUnitVerdict,
+    setUnitSummary,
+    setCurrentSpeaker,
     resetUnits,
     addLog,
+    updateLastLog,
     clearLogs,
     resetAll,
   } = useDebateStore();
 
   const abortRef = useRef<AbortController | null>(null);
+  const topicRef = useRef(topic);
+  const debateHistoryRef = useRef("");
+  const summarizedRolesRef = useRef<Set<string>>(new Set());
+
+  // 保持 topicRef 同步
+  topicRef.current = topic;
 
   // ── 处理 SSE 数据块 ──────────────────────────────────────
-  const handleChunk = useCallback(
-    (data: StreamChunk) => {
-      if (data.token) {
-        appendUnitContent(data.role, data.token);
-      }
-      if (data.finished) {
-        setUnitStatus(data.role, "done");
-        addLog(data.role, `${data.role} 发言完毕`);
+  const handleSseData = useCallback(
+    (data: SseData) => {
+      switch (data.type) {
+        case "sys":
+          // 系统消息 → 添加日志
+          addLog("sys", data.content || "");
+          break;
+
+        case "start":
+          // 开始发言 → 切换发言人 + 创建日志条目
+          if (data.role) {
+            setCurrentSpeaker(data.role);
+            setUnitStatus(data.role, "speaking");
+            addLog(data.role, "");
+          }
+          break;
+
+        case "chunk":
+          // 内容块 → 追加到当前发言人 + 更新日志
+          if (data.content) {
+            // 找到当前发言人
+            const currentRole = useDebateStore.getState().currentSpeaker;
+            if (currentRole) {
+              appendUnitContent(currentRole, data.content);
+              updateLastLog(data.content);
+            }
+          }
+          break;
+
+        case "verdict":
+          // 表态 → 更新贤人表态
+          if (data.role && data.verdict) {
+            setUnitVerdict(data.role, data.verdict as Verdict);
+            setUnitStatus(data.role, "done");
+            addLog("sys", `${data.role.toUpperCase()} 表态: ${data.verdict}`);
+          }
+          break;
       }
     },
-    [appendUnitContent, setUnitStatus, addLog]
+    [addLog, setCurrentSpeaker, setUnitStatus, appendUnitContent, updateLastLog, setUnitVerdict]
   );
 
   // ── 处理辩论结束 ─────────────────────────────────────────
   const handleEnd = useCallback(() => {
     setDebating(false);
-    addLog("sys", "辩论结束");
-  }, [setDebating, addLog]);
+    setCurrentSpeaker(null);
+    addLog("sys", ">>> 军机处回禀：本轮辩论已结案。等待用户下一步定夺。");
+
+    // 构建辩论历史
+    const state = useDebateStore.getState();
+    const fullLog = state.logLines
+      .map((log) => {
+        if (log.role === "sys") return `【系統】${log.content}`;
+        const nameMap: Record<string, string> = {
+          melchior: "梅爾基奧",
+          balthasar: "巴爾薩澤",
+          casper: "卡斯珀",
+        };
+        return `【${nameMap[log.role] || log.role}】${log.content}`;
+      })
+      .join("\n");
+    debateHistoryRef.current = `初始議題：${topicRef.current}\n\n${fullLog}`;
+
+    // 为每个已发言但未总结的角色生成观点总结
+    const lastSpeaker = useDebateStore.getState().currentSpeaker;
+    if (lastSpeaker && !summarizedRolesRef.current.has(lastSpeaker)) {
+      summarizedRolesRef.current.add(lastSpeaker);
+      const lastContent = state.logLines
+        .filter((log) => log.role === lastSpeaker && log.content)
+        .map((log) => log.content)
+        .join("\n");
+      if (lastContent.trim()) {
+        fetchUnitSummary({
+          role: lastSpeaker,
+          content: lastContent,
+          topic: topicRef.current,
+        })
+          .then((res) => {
+            setUnitSummary(lastSpeaker, res.summary);
+            if (res.verdict) {
+              setUnitVerdict(lastSpeaker, res.verdict as Verdict);
+            }
+          })
+          .catch((err) => console.warn(`[${lastSpeaker}] 观点总结失败:`, err));
+      }
+    }
+  }, [setDebating, setCurrentSpeaker, addLog, setUnitSummary, setUnitVerdict]);
 
   // ── 处理错误 ─────────────────────────────────────────────
   const handleError = useCallback(
     (err: Error) => {
       setDebating(false);
-      addLog("sys", `错误: ${err.message}`);
+      setCurrentSpeaker(null);
+      addLog("sys", `>>> 【系統故障】${err.message}`);
       console.error("Debate error:", err);
     },
-    [setDebating, addLog]
+    [setDebating, setCurrentSpeaker, addLog]
   );
 
   // ── 开始辩论 ─────────────────────────────────────────────
@@ -74,9 +159,11 @@ export function useDebateController() {
     if (!topic.trim()) return;
 
     resetAll();
+    summarizedRolesRef.current = new Set();
+    debateHistoryRef.current = "";
     setDebating(true);
     setSummarized(false);
-    addLog("sys", `辩论开始: "${topic}"`);
+    addLog("sys", `>>> 新议题已呈上：【${topic}】`);
 
     // 设置初始状态
     (["melchior", "balthasar", "casper"] as MagiRole[]).forEach((role) => {
@@ -89,24 +176,19 @@ export function useDebateController() {
         topic: topic.trim(),
         model_choice: modelChoice,
       },
-      (chunk) => {
-        // 首次收到 token 时切换为 speaking
-        if (chunk.token) {
-          setUnitStatus(chunk.role, "speaking");
-        }
-        handleChunk(chunk);
-      },
+      handleSseData,
       handleEnd,
       handleError
     );
-  }, [topic, modelChoice, resetAll, setDebating, setSummarized, addLog, setUnitStatus, handleChunk, handleEnd, handleError]);
+  }, [topic, modelChoice, resetAll, setDebating, setSummarized, addLog, setUnitStatus, handleSseData, handleEnd, handleError]);
 
   // ── 继续辩论（修订） ─────────────────────────────────────
   const continueDebate = useCallback(() => {
     if (!topic.trim()) return;
 
+    summarizedRolesRef.current = new Set();
     setDebating(true);
-    addLog("sys", "继续辩论...");
+    addLog("sys", ">>> 收到用户锦囊，基于历史战报开启新一轮推演...");
 
     (["melchior", "balthasar", "casper"] as MagiRole[]).forEach((role) => {
       setUnitStatus(role, "thinking");
@@ -116,39 +198,42 @@ export function useDebateController() {
       {
         topic: topic.trim(),
         model_choice: modelChoice,
+        history: debateHistoryRef.current,
         directive: "请从不同角度继续深入讨论",
       },
-      (chunk) => {
-        if (chunk.token) {
-          setUnitStatus(chunk.role, "speaking");
-        }
-        handleChunk(chunk);
-      },
+      handleSseData,
       handleEnd,
       handleError
     );
-  }, [topic, modelChoice, setDebating, addLog, setUnitStatus, handleChunk, handleEnd, handleError]);
+  }, [topic, modelChoice, setDebating, addLog, setUnitStatus, handleSseData, handleEnd, handleError]);
 
   // ── 总结 ─────────────────────────────────────────────────
   const handleSummarize = useCallback(async () => {
-    setDebating(true);
-    addLog("sys", "正在生成总结...");
+    if (!debateHistoryRef.current) return;
+
+    addLog("sys", ">>> 正在生成总结...");
 
     try {
-      const debateContent = units
-        .map((u) => `${u.role.toUpperCase()}:\n${u.content}`)
-        .join("\n\n");
-
-      const result = await fetchSummary(debateContent);
-      addLog("sys", `总结: ${result.summary}`);
+      const result = await fetchSummary(
+        debateHistoryRef.current,
+        topicRef.current
+      );
+      addLog("sys", `>>> 总结: ${result.summary}`);
       setSummarized(true);
+
+      // 更新各贤人的表态
+      if (result.verdicts) {
+        (Object.entries(result.verdicts) as [MagiRole, string][]).forEach(
+          ([role, verdict]) => {
+            setUnitVerdict(role, verdict as Verdict);
+          }
+        );
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "未知错误";
-      addLog("sys", `总结失败: ${msg}`);
-    } finally {
-      setDebating(false);
+      addLog("sys", `>>> 【總結失敗】${msg}`);
     }
-  }, [units, setDebating, addLog, setSummarized]);
+  }, [addLog, setSummarized, setUnitVerdict]);
 
   // ── 话题输入处理 ─────────────────────────────────────────
   const handleTopicKeyDown = useCallback(

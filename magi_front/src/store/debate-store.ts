@@ -18,28 +18,12 @@ import type {
 
 // ─── 默认单元数据 ───────────────────────────────────────────
 const DEFAULT_UNITS: UnitData[] = [
-  {
-    role: "melchior",
-    content: "",
-    status: "idle",
-    verdict: null,
-    badgeColor: "#00BFFF",
-  },
-  {
-    role: "balthasar",
-    content: "",
-    status: "idle",
-    verdict: null,
-    badgeColor: "#FFD700",
-  },
-  {
-    role: "casper",
-    content: "",
-    status: "idle",
-    verdict: null,
-    badgeColor: "#32CD32",
-  },
+  { role: "melchior", content: "", status: "idle", verdict: null },
+  { role: "balthasar", content: "", status: "idle", verdict: null },
+  { role: "casper", content: "", status: "idle", verdict: null },
 ];
+
+let logIdCounter = 0;
 
 // ─── Store 类型 ─────────────────────────────────────────────
 export interface DebateState {
@@ -57,6 +41,8 @@ export interface DebateState {
   modelChoice: Record<string, string>;
   /** 是否已总结 */
   isSummarized: boolean;
+  /** 当前发言角色 */
+  currentSpeaker: MagiRole | null;
 
   // ─── Actions ────────────────────────────────────────────
   setAppStage: (stage: AppStage) => void;
@@ -64,18 +50,23 @@ export interface DebateState {
   setDebating: (debating: boolean) => void;
   setSummarized: (summarized: boolean) => void;
   setModelChoice: (choice: Record<string, string>) => void;
+  setCurrentSpeaker: (role: MagiRole | null) => void;
 
-  /** 更新指定贤人的内容（追加 token） */
-  appendUnitContent: (role: MagiRole, token: string) => void;
-  /** 更新指定贤人的状态 */
+  /** 追加贤人发言内容 */
+  appendUnitContent: (role: MagiRole, content: string) => void;
+  /** 设置贤人状态 */
   setUnitStatus: (role: MagiRole, status: UnitStatus) => void;
-  /** 更新指定贤人的表态 */
+  /** 设置贤人表态 */
   setUnitVerdict: (role: MagiRole, verdict: Verdict) => void;
-  /** 重置所有贤人数据 */
+  /** 设置贤人总结 */
+  setUnitSummary: (role: MagiRole, summary: string) => void;
+  /** 重置所有贤人 */
   resetUnits: () => void;
 
   /** 添加日志条目 */
-  addLog: (role: LogRole, text: string) => void;
+  addLog: (role: LogRole, content: string) => void;
+  /** 更新最后一条日志的内容（用于 SSE chunk 追加） */
+  updateLastLog: (content: string) => void;
   /** 清空日志 */
   clearLogs: () => void;
 
@@ -93,6 +84,7 @@ export const useDebateStore = create<DebateState>((set) => ({
   topic: "",
   modelChoice: {},
   isSummarized: false,
+  currentSpeaker: null,
 
   // ── Actions ──
   setAppStage: (stage) => set({ appStage: stage }),
@@ -105,10 +97,12 @@ export const useDebateStore = create<DebateState>((set) => ({
 
   setModelChoice: (choice) => set({ modelChoice: choice }),
 
-  appendUnitContent: (role, token) =>
+  setCurrentSpeaker: (role) => set({ currentSpeaker: role }),
+
+  appendUnitContent: (role, content) =>
     set((state) => ({
       units: state.units.map((u) =>
-        u.role === role ? { ...u, content: u.content + token } : u
+        u.role === role ? { ...u, content: u.content + content } : u
       ),
     })),
 
@@ -126,18 +120,35 @@ export const useDebateStore = create<DebateState>((set) => ({
       ),
     })),
 
+  setUnitSummary: (role, summary) =>
+    set((state) => ({
+      units: state.units.map((u) =>
+        u.role === role ? { ...u, summary } : u
+      ),
+    })),
+
   resetUnits: () =>
     set({
       units: DEFAULT_UNITS.map((u) => ({ ...u })),
     }),
 
-  addLog: (role, text) =>
+  addLog: (role, content) =>
     set((state) => ({
       logLines: [
         ...state.logLines,
-        { role, text, timestamp: Date.now() },
+        { id: ++logIdCounter, role, content },
       ],
     })),
+
+  updateLastLog: (content) =>
+    set((state) => {
+      const lines = [...state.logLines];
+      const last = lines[lines.length - 1];
+      if (last) {
+        lines[lines.length - 1] = { ...last, content };
+      }
+      return { logLines: lines };
+    }),
 
   clearLogs: () => set({ logLines: [] }),
 
@@ -148,5 +159,6 @@ export const useDebateStore = create<DebateState>((set) => ({
       isDebating: false,
       isSummarized: false,
       topic: "",
+      currentSpeaker: null,
     }),
 }));

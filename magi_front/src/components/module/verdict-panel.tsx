@@ -1,6 +1,8 @@
 // ============================================================
 // MAGI2.0 — 表态面板 (Module 组件)
 // 规则 R5: 每个文件 ≤ 200 行
+//
+// 显示三贤人的最终表态结果
 // ============================================================
 
 "use client";
@@ -22,7 +24,7 @@ export function VerdictPanel({ units }: VerdictPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
       <div className="text-[10px] font-bold tracking-widest text-red-400/80">
-        ▸ 表態
+        ▸ 決議
       </div>
 
       <div className="flex flex-col gap-2">
@@ -31,10 +33,7 @@ export function VerdictPanel({ units }: VerdictPanelProps) {
             key={unit.role}
             className="flex items-center justify-between px-2 py-1.5 border border-red-900/10 bg-black/20"
           >
-            <span
-              className="text-[8px] font-bold tracking-wider"
-              style={{ color: unit.badgeColor }}
-            >
+            <span className="text-[8px] font-bold tracking-wider text-red-400/80">
               {ROLE_LABELS[unit.role]}
             </span>
             <VerdictBadge verdict={unit.verdict} />

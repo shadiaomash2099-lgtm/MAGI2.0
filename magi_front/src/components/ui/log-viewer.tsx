@@ -14,7 +14,6 @@ interface LogViewerProps {
 
 const ROLE_COLORS: Record<string, string> = {
   sys: "text-red-400",
-  user: "text-gray-400",
   melchior: "text-cyan-400",
   balthasar: "text-yellow-400",
   casper: "text-green-400",
@@ -39,15 +38,12 @@ export function LogViewer({ logLines }: LogViewerProps) {
       {logLines.length === 0 && (
         <span className="text-gray-600 italic">等待系統日誌...</span>
       )}
-      {logLines.map((entry, i) => (
-        <div key={i} className="flex gap-1.5">
-          <span className="text-gray-600 shrink-0">
-            [{new Date(entry.timestamp).toLocaleTimeString()}]
-          </span>
+      {logLines.map((entry) => (
+        <div key={entry.id} className="flex gap-1.5">
           <span className={`${ROLE_COLORS[entry.role] || "text-gray-300"} shrink-0`}>
             {'<'}{entry.role}{'>'}
           </span>
-          <span className="text-gray-300 break-all">{entry.text}</span>
+          <span className="text-gray-300 break-all">{entry.content}</span>
         </div>
       ))}
     </div>

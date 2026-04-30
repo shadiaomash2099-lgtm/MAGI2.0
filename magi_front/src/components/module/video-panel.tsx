@@ -1,6 +1,8 @@
 // ============================================================
-// MAGI2.0 — 日志/视频面板 (Module 组件)
+// MAGI2.0 — 系统日志面板 (Module 组件)
 // 规则 R5: 每个文件 ≤ 200 行
+//
+// 显示辩论过程中的所有日志（系统消息 + 各贤人发言）
 // ============================================================
 
 "use client";
@@ -16,7 +18,7 @@ export function VideoPanel({ logLines }: VideoPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
       <div className="text-[10px] font-bold tracking-widest text-red-400/80">
-        ▸ 系統日誌
+        ▸ 軍機處卷宗
       </div>
 
       <div className="flex-1 border border-red-900/10 bg-black/30 p-2 min-h-0">

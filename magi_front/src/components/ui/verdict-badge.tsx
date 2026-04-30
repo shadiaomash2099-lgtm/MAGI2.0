@@ -1,6 +1,8 @@
 // ============================================================
 // MAGI2.0 — 表态徽章 (UI 组件)
 // 规则 R5: 每个文件 ≤ 200 行
+//
+// 后端返回繁体中文表态: 承認 / 否認 / 疑慮
 // ============================================================
 
 "use client";
@@ -15,16 +17,16 @@ const VERDICT_CONFIG: Record<
   Verdict,
   { label: string; className: string }
 > = {
-  agree: {
-    label: "賛成",
+  承認: {
+    label: "承認",
     className: "bg-green-900/40 text-green-400 border-green-500/30",
   },
-  disagree: {
-    label: "反対",
+  否認: {
+    label: "否認",
     className: "bg-red-900/40 text-red-400 border-red-500/30",
   },
-  neutral: {
-    label: "保留",
+  疑慮: {
+    label: "疑慮",
     className: "bg-yellow-900/40 text-yellow-400 border-yellow-500/30",
   },
 };

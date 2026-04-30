@@ -1,6 +1,11 @@
 // ============================================================
 // MAGI2.0 — 提案面板 (Module 组件)
 // 规则 R5: 每个文件 ≤ 200 行
+//
+// 功能:
+//   - 话题输入框
+//   - 三贤人模型选择器
+//   - 开始/修订/总结 控制按钮
 // ============================================================
 
 "use client";
@@ -41,7 +46,7 @@ export function ProposalPanel({
     <div className="flex flex-col h-full p-3 gap-3">
       {/* 标题 */}
       <div className="text-[10px] font-bold tracking-widest text-red-400/80">
-        ▸ 提案
+        ▸ 提訴
       </div>
 
       {/* 话题输入 */}
