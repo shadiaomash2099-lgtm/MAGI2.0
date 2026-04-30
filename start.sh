@@ -114,7 +114,13 @@ fi
 source "$BACKEND_DIR/venv/bin/activate"
 if ! python3 -c "import dotenv" 2>/dev/null; then
     echo -e "${YELLOW}  ⚡ 安装后端依赖...${NC}"
-    pip install -q fastapi uvicorn pydantic httpx python-dotenv openai
+    pip install -q fastapi uvicorn pydantic httpx python-dotenv openai opencc-python-reimplemented
+else
+    # 确保 opencc 已安装（translator.py 依赖）
+    if ! python3 -c "import opencc" 2>/dev/null; then
+        echo -e "${YELLOW}  ⚡ 安装 opencc（简繁转换）...${NC}"
+        pip install -q opencc-python-reimplemented
+    fi
 fi
 echo -e "${GREEN}  ✔ 后端依赖就绪${NC}"
 
