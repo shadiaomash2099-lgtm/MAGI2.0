@@ -88,7 +88,7 @@ echo ""
 # --------------------------------------------------
 # 1. 检查运行环境
 # --------------------------------------------------
-echo -e "${YELLOW}[1/5] 检查运行环境...${NC}"
+echo -e "${YELLOW}[1/6] 检查运行环境...${NC}"
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}  ✖ 未找到 python3，请安装 Python 3.10+${NC}"
     exit 1
@@ -104,7 +104,7 @@ echo -e "${GREEN}  ✔ Node $(node --version)${NC}"
 # --------------------------------------------------
 # 2. 检查依赖
 # --------------------------------------------------
-echo -e "${YELLOW}[2/5] 检查依赖...${NC}"
+echo -e "${YELLOW}[2/6] 检查依赖...${NC}"
 
 # 后端依赖
 if [ ! -d "$BACKEND_DIR/venv" ]; then
@@ -132,16 +132,39 @@ fi
 echo -e "${GREEN}  ✔ 前端依赖就绪${NC}"
 
 # --------------------------------------------------
-# 3. 释放端口
+# 3. 检查运行时资源
 # --------------------------------------------------
-echo -e "${YELLOW}[3/5] 检查端口占用...${NC}"
+echo -e "${YELLOW}[3/5] 检查运行时资源...${NC}"
+
+# 确保 static/ 目录存在（main.py 挂载了 StaticFiles）
+if [ ! -d "$PROJECT_DIR/static" ]; then
+    echo -e "${YELLOW}  ⚡ 创建 static/ 目录...${NC}"
+    mkdir -p "$PROJECT_DIR/static"
+fi
+echo -e "${GREEN}  ✔ static/ 目录就绪${NC}"
+
+# 确保 .env 文件存在
+if [ ! -f "$PROJECT_DIR/.env" ]; then
+    echo -e "${YELLOW}  ⚡ 创建 .env 文件模板...${NC}"
+    cat > "$PROJECT_DIR/.env" << 'ENVEOF'
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
+KIMI_API_KEY=your_kimi_api_key_here
+ENVEOF
+    echo -e "${RED}  ⚠ 请编辑 .env 文件填入你的 API Key${NC}"
+fi
+echo -e "${GREEN}  ✔ .env 文件就绪${NC}"
+
+# --------------------------------------------------
+# 4. 释放端口
+# --------------------------------------------------
+echo -e "${YELLOW}[4/5] 检查端口占用...${NC}"
 free_port "$BACKEND_PORT"
 free_port "$FRONTEND_PORT"
 
 # --------------------------------------------------
-# 4. 启动后端
+# 5. 启动后端
 # --------------------------------------------------
-echo -e "${YELLOW}[4/5] 启动后端服务...${NC}"
+echo -e "${YELLOW}[5/5] 启动后端服务...${NC}"
 cd "$PROJECT_DIR"
 source "$BACKEND_DIR/venv/bin/activate"
 uvicorn backend.main:app --host 0.0.0.0 --port "$BACKEND_PORT" --reload --log-level warning &
@@ -162,7 +185,7 @@ FRONTEND_PID=$!
 wait_for_port "$FRONTEND_PORT" "前端" 60 || exit 1
 
 # --------------------------------------------------
-# 5. 打开浏览器
+# 6. 打开浏览器
 # --------------------------------------------------
 echo ""
 echo -e "${CYAN}============================================${NC}"
