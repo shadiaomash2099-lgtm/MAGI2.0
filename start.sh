@@ -136,9 +136,9 @@ free_port "$FRONTEND_PORT"
 # 4. 启动后端
 # --------------------------------------------------
 echo -e "${YELLOW}[4/5] 启动后端服务...${NC}"
-cd "$BACKEND_DIR"
+cd "$PROJECT_DIR"
 source "$BACKEND_DIR/venv/bin/activate"
-uvicorn main:app --host 0.0.0.0 --port "$BACKEND_PORT" --reload --log-level warning &
+uvicorn backend.main:app --host 0.0.0.0 --port "$BACKEND_PORT" --reload --log-level warning &
 BACKEND_PID=$!
 
 # 等待后端就绪
