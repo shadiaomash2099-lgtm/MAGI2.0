@@ -2,18 +2,464 @@
 
 /* ============================================================
    MAGI2.0 — 全局样式
+   NERV 红色主题 — EVA 风格
    规则 R15: CSS 变量集中定义
    规则 R16: 组件动画使用 CSS Modules，不污染全局
    ============================================================ */
 
-/* ─── 主题变量 ─────────────────────────────────────────── */
+/* ─── EVA 明朝体 ───────────────────────────────────────── */
+@font-face {
+  font-family: 'Matisse Pro';
+  src: url('/fonts/MatissePro-UB.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Matisse Pro';
+  src: url('/fonts/MatissePro-EB.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Matisse Pro';
+  src: url('/fonts/MatissePro-B.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Matisse Pro';
+  src: url('/fonts/MatissePro-M.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── 主题变量 (NERV Red) ──────────────────────────────── */
 :root {
-  --color-magi-amber: #ffb400;
-  --color-magi-green: #00ff41;
-  --color-magi-cyan: #00bfff;
-  --color-magi-gold: #ffd700;
-  --color-magi-lime: #32cd32;
-  --color-magi-red: #ff3333;
+  --background: oklch(0.05 0 0);
+  --foreground: oklch(0.65 0.25 30);
+  --card: oklch(0.1 0.02 30);
+  --card-foreground: oklch(0.65 0.25 30);
+  --popover: oklch(0.08 0 0);
+  --popover-foreground: oklch(0.65 0.25 30);
+  --primary: oklch(0.6 0.25 30);
+  --primary-foreground: oklch(0.05 0 0);
+  --secondary: oklch(0.15 0.02 30);
+  --secondary-foreground: oklch(0.65 0.25 30);
+  --muted: oklch(0.2 0.02 30);
+  --muted-foreground: oklch(0.45 0.12 30);
+  --accent: oklch(0.65 0.25 30);
+  --accent-foreground: oklch(0.05 0 0);
+  --destructive: oklch(0.65 0.28 25);
+  --destructive-foreground: oklch(0.05 0 0);
+  --border: oklch(0.35 0.15 30);
+  --input: oklch(0.15 0.02 30);
+  --ring: oklch(0.6 0.25 30);
+  --radius: 0rem;
+
+  /* Custom MAGI colors - NERV Red theme */
+  --magi-red: oklch(0.65 0.25 30);
+  --magi-amber: oklch(0.75 0.2 80);
+  --magi-cyan: oklch(0.75 0.15 200);
+  --magi-pink: oklch(0.7 0.18 350);
+  --magi-glow: oklch(0.65 0.25 30 / 0.5);
+  --magi-border: oklch(0.45 0.18 30);
+}
+
+@theme inline {
+  --font-sans: 'Matisse Pro', 'Courier New', monospace;
+  --font-mono: 'Matisse Pro', 'Courier New', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Custom MAGI theme colors */
+  --color-magi-red: var(--magi-red);
+  --color-magi-amber: var(--magi-amber);
+  --color-magi-cyan: var(--magi-cyan);
+  --color-magi-pink: var(--magi-pink);
+  --color-magi-glow: var(--magi-glow);
+  --color-magi-border: var(--magi-border);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ─── CRT 扫描线 ───────────────────────────────────────── */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.85; }
+  94% { opacity: 1; }
+  97% { opacity: 0.92; }
+  98% { opacity: 1; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px var(--magi-red)) drop-shadow(0 0 4px var(--magi-red));
+  }
+  50% {
+    filter: drop-shadow(0 0 4px var(--magi-red)) drop-shadow(0 0 8px var(--magi-red));
+  }
+}
+
+@keyframes text-glow {
+  0%, 100% { text-shadow: 0 0 4px currentColor, 0 0 8px currentColor; }
+  50% { text-shadow: 0 0 8px currentColor, 0 0 16px currentColor; }
+}
+
+.animate-scanline {
+  animation: scanline 6s linear infinite;
+}
+
+.animate-flicker {
+  animation: flicker 5s infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-text-glow {
+  animation: text-glow 2s ease-in-out infinite;
+}
+
+/* ─── 打字机光标 ───────────────────────────────────────── */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor {
+  animation: cursor-blink 0.7s step-end infinite;
+}
+
+/* ─── 自定义滚动条 ─────────────────────────────────────── */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: oklch(0.65 0.25 30 / 0.3);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.65 0.25 30 / 0.5);
+}
+
+/* ─── CRT 屏幕效果 ─────────────────────────────────────── */
+.crt-screen {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.12),
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ─── LCL 呼吸动画（发言时卡片背景红色呼吸） ──────────── */
+@keyframes lcl-breathe {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 4px oklch(0.55 0.22 30 / 0.3));
+  }
+  50% {
+    filter: brightness(1.15) drop-shadow(0 0 12px oklch(0.55 0.22 30 / 0.6));
+  }
+}
+
+.animate-lcl {
+  animation: lcl-breathe 2.5s ease-in-out infinite;
+}
+
+/* ─── 启动画面 ─────────────────────────────────────────── */
+@keyframes boot-sequence {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
+
+@keyframes boot-progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.boot-screen {
+  animation: boot-sequence 2.5s ease-in-out forwards;
+}
+
+.animate-boot-progress {
+  animation: boot-progress 2s ease-in-out forwards;
+}
+
+/* ─── Markdown 渲染样式 ─────────────────────────────────── */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  color: oklch(0.65 0.25 30);
+  font-weight: 700;
+  margin: 0.5em 0 0.25em;
+}
+
+.markdown-content p {
+  margin: 0.25em 0;
+}
+
+.markdown-content code {
+  color: oklch(0.75 0.15 200);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0 4px;
+  font-size: 0.8em;
+  border-radius: 2px;
+}
+
+.markdown-content pre {
+  border: 1px solid oklch(0.65 0.25 30 / 0.2);
+  padding: 8px;
+  margin: 4px 0;
+  overflow-x: auto;
+}
+
+.markdown-content blockquote {
+  border-left: 2px solid oklch(0.65 0.25 30 / 0.3);
+  padding-left: 8px;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ─── AT Field 脉冲光晕 ────────────────────────────────── */
+@keyframes at-field-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+.animate-at-field {
+  animation: at-field-pulse 3s ease-in-out infinite;
+}
+
+/* ─── 粒子闪烁 ─────────────────────────────────────────── */
+@keyframes particle-twinkle {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-particle-twinkle {
+  animation: particle-twinkle 2s ease-in-out infinite;
+}
+
+/* ─── 数据流扫描线 ─────────────────────────────────────── */
+@keyframes data-stream {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+.animate-data-stream {
+  animation: data-stream 4s linear infinite;
+}
+
+/* ─── 发言能量波纹 ─────────────────────────────────────── */
+@keyframes energy-ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 50, 50, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgba(255, 50, 50, 0.15);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 50, 50, 0);
+  }
+}
+
+.animate-energy-ripple {
+  animation: energy-ripple 2s ease-in-out infinite;
+}
+
+/* ─── AT Field 涟漪波纹 ────────────────────────────────── */
+@keyframes at-field-ripple-1 {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.25; transform: scale(1.30); }
+}
+
+@keyframes at-field-ripple-2 {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0.2; transform: scale(1.40); }
+}
+
+@keyframes at-field-ripple-3 {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 0.15; transform: scale(1.50); }
+}
+
+.animate-at-field-ripple-1 {
+  animation: at-field-ripple-1 3s ease-out infinite;
+}
+
+.animate-at-field-ripple-2 {
+  animation: at-field-ripple-2 3s ease-out infinite;
+  animation-delay: 1s;
+}
+
+.animate-at-field-ripple-3 {
+  animation: at-field-ripple-3 3s ease-out infinite;
+  animation-delay: 2s;
+}
+
+/* ─── 表态徽章弹出 ─────────────────────────────────────── */
+@keyframes badge-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-badge-pop {
+  animation: badge-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ─── 总结内容渐入 ─────────────────────────────────────── */
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+/* ─── 模块入场动画 ─────────────────────────────────────── */
+@keyframes module-appear {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-module-appear {
+  animation: module-appear 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ─── 数据流动画 ───────────────────────────────────────── */
+@keyframes data-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-data-flow {
+  animation: data-flow 2s linear infinite;
+}
+
+/* ─── 边框发光动画 ─────────────────────────────────────── */
+@keyframes border-glow {
+  0%, 100% {
+    box-shadow: 0 0 2px var(--magi-red), inset 0 0 2px var(--magi-red);
+    opacity: 0.3;
+  }
+  50% {
+    box-shadow: 0 0 6px var(--magi-red), inset 0 0 6px var(--magi-red);
+    opacity: 0.6;
+  }
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* ─── 网格纹理背景 ─────────────────────────────────────── */
+.grid-texture {
+  background-image:
+    linear-gradient(rgba(255, 50, 50, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 50, 50, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ─── 噪点效果 ─────────────────────────────────────────── */
+.noise-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── 选择文本颜色 ─────────────────────────────────────── */
+::selection {
+  background: rgba(255, 50, 50, 0.3);
+  color: #fff;
 }
 
 /* ─── 全局基础 ─────────────────────────────────────────── */
@@ -29,59 +475,4 @@ body {
   font-family: "Courier New", Courier, monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* ─── 自定义滚动条 ─────────────────────────────────────── */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 3px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 180, 0, 0.2);
-  border-radius: 2px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 180, 0, 0.4);
-}
-
-/* ─── 选择文本颜色 ─────────────────────────────────────── */
-::selection {
-  background: rgba(255, 180, 0, 0.3);
-  color: #fff;
-}
-
-/* ─── Markdown 渲染样式 ─────────────────────────────────── */
-.prose-magi {
-  font-size: 9px;
-  line-height: 1.5;
-}
-
-.prose-magi p {
-  margin: 0 0 4px;
-}
-
-.prose-magi ul,
-.prose-magi ol {
-  margin: 2px 0;
-  padding-left: 12px;
-}
-
-.prose-magi li {
-  margin: 1px 0;
-}
-
-.prose-magi strong {
-  color: #ffb400;
-}
-
-.prose-magi code {
-  background: rgba(255, 180, 0, 0.1);
-  padding: 0 3px;
-  border-radius: 2px;
-  font-size: 8px;
 }

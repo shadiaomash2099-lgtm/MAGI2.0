@@ -40,7 +40,7 @@ export function ProposalPanel({
   return (
     <div className="flex flex-col h-full p-3 gap-3">
       {/* 标题 */}
-      <div className="text-[10px] font-bold tracking-widest text-amber-400/80">
+      <div className="text-[10px] font-bold tracking-widest text-red-400/80">
         ▸ 提案
       </div>
 

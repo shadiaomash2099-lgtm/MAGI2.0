@@ -21,15 +21,15 @@ const STATUS_CONFIG: Record<
   },
   thinking: {
     label: "ANALYZING",
-    className: "text-yellow-400 animate-pulse",
+    className: "text-red-400 animate-pulse",
   },
   speaking: {
     label: "SPEAKING",
-    className: "text-green-400 animate-pulse",
+    className: "text-red-300 animate-pulse animate-text-glow",
   },
   done: {
     label: "COMPLETE",
-    className: "text-blue-400",
+    className: "text-red-400",
   },
 };
 

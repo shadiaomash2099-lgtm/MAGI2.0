@@ -25,11 +25,11 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
 
   return (
     <div
-      className="relative w-full h-full flex flex-col border border-amber-700/20 bg-black/40"
+      className="relative w-full h-full flex flex-col border border-red-900/20 bg-black/40 crt-screen"
       style={{ clipPath }}
     >
       {/* 顶部状态栏 */}
-      <div className="flex items-center justify-between px-2 py-1 border-b border-amber-700/10">
+      <div className="flex items-center justify-between px-2 py-1 border-b border-red-900/10">
         <span
           className="text-[9px] font-bold tracking-widest"
           style={{ color: data.badgeColor }}
@@ -42,7 +42,11 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
       </div>
 
       {/* 内容区 */}
-      <div className="flex-1 overflow-y-auto p-2 text-[9px] leading-relaxed text-gray-300 scrollbar-thin">
+      <div
+        className={`flex-1 overflow-y-auto p-2 text-[9px] leading-relaxed text-gray-300 scrollbar-thin markdown-content ${
+          data.status === "speaking" ? "animate-lcl" : ""
+        }`}
+      >
         {data.content ? (
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {data.content}
@@ -53,7 +57,7 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
       </div>
 
       {/* 底部: 表态徽章 + 自定义内容 */}
-      <div className="flex items-center gap-2 px-2 py-1 border-t border-amber-700/10">
+      <div className="flex items-center gap-2 px-2 py-1 border-t border-red-900/10">
         <VerdictBadge verdict={data.verdict} />
         {children}
       </div>

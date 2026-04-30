@@ -21,7 +21,7 @@ const ROLE_LABELS: Record<string, string> = {
 export function VerdictPanel({ units }: VerdictPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
-      <div className="text-[10px] font-bold tracking-widest text-amber-400/80">
+      <div className="text-[10px] font-bold tracking-widest text-red-400/80">
         ▸ 表態
       </div>
 
@@ -29,7 +29,7 @@ export function VerdictPanel({ units }: VerdictPanelProps) {
         {units.map((unit) => (
           <div
             key={unit.role}
-            className="flex items-center justify-between px-2 py-1.5 border border-amber-700/10 bg-black/20"
+            className="flex items-center justify-between px-2 py-1.5 border border-red-900/10 bg-black/20"
           >
             <span
               className="text-[8px] font-bold tracking-wider"
