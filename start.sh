@@ -112,9 +112,9 @@ if [ ! -d "$BACKEND_DIR/venv" ]; then
     python3 -m venv "$BACKEND_DIR/venv"
 fi
 source "$BACKEND_DIR/venv/bin/activate"
-if ! python3 -c "import fastapi" 2>/dev/null; then
+if ! python3 -c "import dotenv" 2>/dev/null; then
     echo -e "${YELLOW}  ⚡ 安装后端依赖...${NC}"
-    pip install -q fastapi uvicorn pydantic httpx
+    pip install -q fastapi uvicorn pydantic httpx python-dotenv openai
 fi
 echo -e "${GREEN}  ✔ 后端依赖就绪${NC}"
 
