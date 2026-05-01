@@ -144,6 +144,7 @@ export function BootScpLogo({ onProceed }: BootScpLogoProps) {
             style={{
               transformOrigin: "67.7px 71.5px",
               animation: phase >= 1 ? "expandIn 0.8s ease-out both" : "none",
+              opacity: phase >= 1 ? 1 : 0,
             }}
           >
             {/* 核心内环 */}
