@@ -40,36 +40,36 @@
   font-display: swap;
 }
 
-/* ─── 主题变量 (NERV Red) ──────────────────────────────── */
+/* ─── 主题变量 (LCL Yellow) ────────────────────────────── */
 :root {
   --background: oklch(0.05 0 0);
-  --foreground: oklch(0.65 0.25 30);
-  --card: oklch(0.1 0.02 30);
-  --card-foreground: oklch(0.65 0.25 30);
+  --foreground: oklch(0.75 0.2 80);
+  --card: oklch(0.1 0.02 80);
+  --card-foreground: oklch(0.75 0.2 80);
   --popover: oklch(0.08 0 0);
-  --popover-foreground: oklch(0.65 0.25 30);
-  --primary: oklch(0.6 0.25 30);
+  --popover-foreground: oklch(0.75 0.2 80);
+  --primary: oklch(0.7 0.2 80);
   --primary-foreground: oklch(0.05 0 0);
-  --secondary: oklch(0.15 0.02 30);
-  --secondary-foreground: oklch(0.65 0.25 30);
-  --muted: oklch(0.2 0.02 30);
-  --muted-foreground: oklch(0.45 0.12 30);
-  --accent: oklch(0.65 0.25 30);
+  --secondary: oklch(0.15 0.02 80);
+  --secondary-foreground: oklch(0.75 0.2 80);
+  --muted: oklch(0.2 0.02 80);
+  --muted-foreground: oklch(0.55 0.15 80);
+  --accent: oklch(0.75 0.2 80);
   --accent-foreground: oklch(0.05 0 0);
-  --destructive: oklch(0.65 0.28 25);
+  --destructive: oklch(0.75 0.22 75);
   --destructive-foreground: oklch(0.05 0 0);
-  --border: oklch(0.35 0.15 30);
-  --input: oklch(0.15 0.02 30);
-  --ring: oklch(0.6 0.25 30);
+  --border: oklch(0.45 0.15 80);
+  --input: oklch(0.15 0.02 80);
+  --ring: oklch(0.7 0.2 80);
   --radius: 0rem;
 
-  /* Custom MAGI colors - NERV Red theme */
-  --magi-red: oklch(0.65 0.25 30);
-  --magi-amber: oklch(0.75 0.2 80);
+  /* Custom MAGI colors - LCL Yellow theme */
+  --magi-lcl: oklch(0.75 0.2 80);
+  --magi-amber: oklch(0.8 0.18 70);
   --magi-cyan: oklch(0.75 0.15 200);
   --magi-pink: oklch(0.7 0.18 350);
-  --magi-glow: oklch(0.65 0.25 30 / 0.5);
-  --magi-border: oklch(0.45 0.18 30);
+  --magi-glow: oklch(0.75 0.2 80 / 0.5);
+  --magi-border: oklch(0.55 0.15 80);
 }
 
 @theme inline {
@@ -130,10 +130,10 @@
 
 @keyframes glow-pulse {
   0%, 100% {
-    filter: drop-shadow(0 0 2px var(--magi-red)) drop-shadow(0 0 4px var(--magi-red));
+    filter: drop-shadow(0 0 2px var(--magi-lcl)) drop-shadow(0 0 4px var(--magi-lcl));
   }
   50% {
-    filter: drop-shadow(0 0 4px var(--magi-red)) drop-shadow(0 0 8px var(--magi-red));
+    filter: drop-shadow(0 0 4px var(--magi-lcl)) drop-shadow(0 0 8px var(--magi-lcl));
   }
 }
 
@@ -178,12 +178,12 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: oklch(0.65 0.25 30 / 0.3);
+  background: oklch(0.65 0.25 80 / 0.3);
   border-radius: 2px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.65 0.25 30 / 0.5);
+  background: oklch(0.65 0.25 80 / 0.5);
 }
 
 /* ─── CRT 屏幕效果 ─────────────────────────────────────── */
@@ -223,10 +223,10 @@
 /* ─── LCL 呼吸动画（发言时卡片背景红色呼吸） ──────────── */
 @keyframes lcl-breathe {
   0%, 100% {
-    filter: brightness(1) drop-shadow(0 0 4px oklch(0.55 0.22 30 / 0.3));
+    filter: brightness(1) drop-shadow(0 0 4px oklch(0.55 0.22 80 / 0.3));
   }
   50% {
-    filter: brightness(1.15) drop-shadow(0 0 12px oklch(0.55 0.22 30 / 0.6));
+    filter: brightness(1.15) drop-shadow(0 0 12px oklch(0.55 0.22 80 / 0.6));
   }
 }
 
@@ -259,7 +259,7 @@
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3 {
-  color: oklch(0.65 0.25 30);
+  color: oklch(0.65 0.25 80);
   font-weight: 700;
   margin: 0.5em 0 0.25em;
 }
@@ -277,14 +277,14 @@
 }
 
 .markdown-content pre {
-  border: 1px solid oklch(0.65 0.25 30 / 0.2);
+  border: 1px solid oklch(0.65 0.25 80 / 0.2);
   padding: 8px;
   margin: 4px 0;
   overflow-x: auto;
 }
 
 .markdown-content blockquote {
-  border-left: 2px solid oklch(0.65 0.25 30 / 0.3);
+  border-left: 2px solid oklch(0.65 0.25 80 / 0.3);
   padding-left: 8px;
   font-style: italic;
   opacity: 0.8;
@@ -337,13 +337,13 @@
 /* ─── 发言能量波纹 ─────────────────────────────────────── */
 @keyframes energy-ripple {
   0% {
-    box-shadow: 0 0 0 0 rgba(255, 50, 50, 0);
+    box-shadow: 0 0 0 0 rgba(255, 200, 50, 0);
   }
   50% {
-    box-shadow: 0 0 20px 4px rgba(255, 50, 50, 0.15);
+    box-shadow: 0 0 20px 4px rgba(255, 200, 50, 0.15);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 50, 50, 0);
+    box-shadow: 0 0 0 0 rgba(255, 200, 50, 0);
   }
 }
 
@@ -425,11 +425,11 @@
 /* ─── 边框发光动画 ─────────────────────────────────────── */
 @keyframes border-glow {
   0%, 100% {
-    box-shadow: 0 0 2px var(--magi-red), inset 0 0 2px var(--magi-red);
+    box-shadow: 0 0 2px var(--magi-lcl), inset 0 0 2px var(--magi-lcl);
     opacity: 0.3;
   }
   50% {
-    box-shadow: 0 0 6px var(--magi-red), inset 0 0 6px var(--magi-red);
+    box-shadow: 0 0 6px var(--magi-lcl), inset 0 0 6px var(--magi-lcl);
     opacity: 0.6;
   }
 }
@@ -441,8 +441,8 @@
 /* ─── 网格纹理背景 ─────────────────────────────────────── */
 .grid-texture {
   background-image:
-    linear-gradient(rgba(255, 50, 50, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 50, 50, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(255, 200, 50, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 200, 50, 0.02) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -567,7 +567,7 @@
 
 /* ─── 选择文本颜色 ─────────────────────────────────────── */
 ::selection {
-  background: rgba(255, 50, 50, 0.3);
+  background: rgba(255, 200, 50, 0.3);
   color: #fff;
 }
 

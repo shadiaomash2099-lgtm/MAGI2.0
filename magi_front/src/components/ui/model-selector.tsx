@@ -39,7 +39,7 @@ export function ModelSelector({
         value={value}
         onChange={(e) => onChange(role, e.target.value)}
         disabled={disabled}
-        className="flex-1 bg-transparent border border-red-700/20 px-1 py-0.5 text-red-400 outline-none focus:border-red-700/40 transition-colors text-[7px]"
+        className="flex-1 bg-transparent border border-amber-700/20 px-1 py-0.5 text-amber-400 outline-none focus:border-amber-700/40 transition-colors text-[7px]"
       >
         {MODEL_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-gray-900">

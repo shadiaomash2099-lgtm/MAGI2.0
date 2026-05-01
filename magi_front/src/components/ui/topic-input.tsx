@@ -26,7 +26,7 @@ export function TopicInput({
       onKeyDown={onKeyDown}
       disabled={disabled}
       placeholder="輸入辯論主題..."
-      className="w-full bg-transparent border border-red-700/20 px-2 py-1 text-[10px] text-red-400 placeholder-gray-600 outline-none focus:border-red-700/40 transition-colors"
+      className="w-full bg-transparent border border-amber-700/20 px-2 py-1 text-[10px] text-amber-400 placeholder-gray-600 outline-none focus:border-amber-700/40 transition-colors"
     />
   );
 }

@@ -17,11 +17,11 @@ interface VideoPanelProps {
 export function VideoPanel({ logLines }: VideoPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
-      <div className="text-[10px] font-bold tracking-widest text-red-400/80">
+      <div className="text-[10px] font-bold tracking-widest text-amber-400/80">
         ▸ 軍機處卷宗
       </div>
 
-      <div className="flex-1 border border-red-900/10 bg-black/30 p-2 min-h-0">
+      <div className="flex-1 border border-amber-900/10 bg-black/30 p-2 min-h-0">
         <LogViewer logLines={logLines} />
       </div>
     </div>

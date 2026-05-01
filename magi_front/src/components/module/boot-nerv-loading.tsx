@@ -63,7 +63,7 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
     <div className="flex flex-col items-center justify-center gap-6">
       {/* NERV 标志 */}
       <div className="animate-nerv-appear flex flex-col items-center">
-        <svg width="100" height="100" viewBox="0 0 120 120" className="text-red-500">
+        <svg width="100" height="100" viewBox="0 0 120 120" className="text-amber-500">
           <circle
             cx="60"
             cy="60"
@@ -75,7 +75,7 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
           <line x1="60" y1="20" x2="60" y2="100" stroke="currentColor" strokeWidth="2" />
           <line x1="20" y1="60" x2="100" y2="60" stroke="currentColor" strokeWidth="2" />
         </svg>
-        <div className="text-red-500 text-3xl font-black text-center mt-3 tracking-[0.15em]">
+        <div className="text-amber-500 text-3xl font-black text-center mt-3 tracking-[0.15em]">
           NERV
         </div>
       </div>
@@ -84,17 +84,17 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
       <div className="w-[360px]">
         <div className="relative h-[3px] bg-white/10 overflow-hidden">
           <div
-            className="absolute inset-y-0 left-0 bg-red-500 transition-all duration-75 ease-linear"
+            className="absolute inset-y-0 left-0 bg-amber-500 transition-all duration-75 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="text-red-500 text-sm text-right mt-2 font-mono tracking-wider">
+        <div className="text-amber-500 text-sm text-right mt-2 font-mono tracking-wider">
           {progress}%
         </div>
       </div>
 
       {/* NERV 红色数字滚动 */}
-      <div className="flex gap-3 text-red-500 font-mono text-xs opacity-70">
+      <div className="flex gap-3 text-amber-500 font-mono text-xs opacity-70">
         {numberRolls.map((num, i) => (
           <div
             key={i}

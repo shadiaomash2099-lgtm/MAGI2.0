@@ -23,7 +23,7 @@ const VERDICT_CONFIG: Record<
   },
   否認: {
     label: "否認",
-    className: "bg-red-900/40 text-red-400 border-red-500/30",
+    className: "bg-amber-900/40 text-amber-400 border-amber-500/30",
   },
   疑慮: {
     label: "疑慮",

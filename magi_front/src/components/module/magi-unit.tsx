@@ -38,12 +38,12 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
 
   return (
     <div
-      className="relative w-full h-full flex flex-col border border-red-900/20 bg-black/40 crt-screen"
+      className="relative w-full h-full flex flex-col border border-amber-900/20 bg-black/40 crt-screen"
       style={{ clipPath }}
     >
       {/* 顶部信息栏 */}
-      <div className="flex items-center justify-between px-2 py-1 border-b border-red-900/10 shrink-0">
-        <span className="text-[8px] font-bold tracking-widest text-red-400/80">
+      <div className="flex items-center justify-between px-2 py-1 border-b border-amber-900/10 shrink-0">
+        <span className="text-[8px] font-bold tracking-widest text-amber-400/80">
           {ROLE_LABELS[data.role] || data.role.toUpperCase()}
         </span>
         <div className={`absolute ${statusTopClass} top-1`}>
@@ -71,7 +71,7 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
       </div>
 
       {/* 底部: 表态徽章 + 自定义内容 */}
-      <div className="flex items-center gap-2 px-2 py-1 border-t border-red-900/10 shrink-0">
+      <div className="flex items-center gap-2 px-2 py-1 border-t border-amber-900/10 shrink-0">
         <VerdictBadge verdict={data.verdict} />
         {children}
       </div>

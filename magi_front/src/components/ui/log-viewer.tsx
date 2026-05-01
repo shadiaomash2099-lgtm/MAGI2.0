@@ -13,7 +13,7 @@ interface LogViewerProps {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  sys: "text-red-400",
+  sys: "text-amber-400",
   melchior: "text-cyan-400",
   balthasar: "text-yellow-400",
   casper: "text-green-400",

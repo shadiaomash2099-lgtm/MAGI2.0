@@ -79,7 +79,7 @@ export function MagiPage() {
         <div className="col-start-1 row-start-1 col-span-full row-span-full flex flex-col w-full h-full overflow-hidden">
           {/* MAGI SYSTEM 标题 */}
           <div className="flex items-center justify-center py-1.5 shrink-0">
-            <h1 className="text-red-400 text-xl md:text-2xl font-black tracking-[0.15em] leading-none animate-text-glow">
+            <h1 className="text-amber-400 text-xl md:text-2xl font-black tracking-[0.15em] leading-none animate-text-glow">
               MAGI SYSTEM
             </h1>
           </div>
@@ -137,12 +137,12 @@ export function MagiPage() {
               className="col-start-1 row-start-1 col-span-full row-span-full pointer-events-none overflow-hidden"
               style={{ zIndex: 50 }}
             >
-              <div className="w-full h-[2px] bg-gradient-to-b from-transparent via-red-500/8 to-transparent animate-scanline" />
+              <div className="w-full h-[2px] bg-gradient-to-b from-transparent via-amber-500/8 to-transparent animate-scanline" />
             </div>
           </div>
 
           {/* 底部状态栏 */}
-          <div className="flex items-center justify-between px-3 py-1 text-[7px] text-red-400/30 tracking-widest border-t border-red-900/15 shrink-0">
+          <div className="flex items-center justify-between px-3 py-1 text-[7px] text-amber-400/30 tracking-widest border-t border-amber-900/15 shrink-0">
             <span suppressHydrationWarning>
               SYS_STATUS: {sysStatus}
             </span>

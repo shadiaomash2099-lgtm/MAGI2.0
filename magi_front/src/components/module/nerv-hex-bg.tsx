@@ -63,11 +63,11 @@ function drawHex(
   ctx.closePath();
 
   // 填充
-  ctx.fillStyle = `rgba(180, 20, 20, ${0.03 + glow * 0.06})`;
+  ctx.fillStyle = `rgba(200, 160, 20, ${0.03 + glow * 0.06})`;
   ctx.fill();
 
   // 边框
-  ctx.strokeStyle = `rgba(200, ${40 + Math.floor(30 * glow)}, ${40 + Math.floor(30 * glow)}, ${0.15 + glow * 0.3})`;
+  ctx.strokeStyle = `rgba(220, ${180 + Math.floor(30 * glow)}, ${40 + Math.floor(30 * glow)}, ${0.15 + glow * 0.3})`;
   ctx.lineWidth = 1;
   ctx.stroke();
 }
