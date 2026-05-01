@@ -42,6 +42,7 @@ const CLIP_PATHS = {
 
 export function MagiPage() {
   const [bootComplete, setBootComplete] = useState(false);
+  const [appear, setAppear] = useState(false);
   const [blink, setBlink] = useState(true);
   const controller = useDebateController();
   const logLines = useDebateStore((s) => s.logLines);
@@ -58,6 +59,12 @@ export function MagiPage() {
 
   const handleBootComplete = useCallback(() => {
     setBootComplete(true);
+    // 触发主界面浮现动画
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setAppear(true);
+      });
+    });
   }, []);
 
   return (
@@ -65,9 +72,16 @@ export function MagiPage() {
       {/* 启动序列覆盖层 */}
       {!bootComplete && <BootSequence onComplete={handleBootComplete} />}
 
-      {/* 主界面 — 启动完成后显示 */}
+      {/* 主界面 — 启动完成后显示（带浮现动画） */}
       {bootComplete && (
-        <div className="col-start-1 row-start-1 col-span-full row-span-full flex flex-col w-full h-full overflow-hidden">
+        <div
+          className="col-start-1 row-start-1 col-span-full row-span-full flex flex-col w-full h-full overflow-hidden"
+          style={{
+            opacity: appear ? 1 : 0,
+            transform: appear ? "translateY(0)" : "translateY(20px)",
+            transition: "all 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
           {/* MAGI SYSTEM 标题 — 与启动层保持一致的红色+大小 */}
           <div className="flex items-center justify-center py-1.5 shrink-0">
             <h1

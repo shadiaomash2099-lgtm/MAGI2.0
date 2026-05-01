@@ -10,7 +10,10 @@
 //   - 三贤者验证块呈三角形排列（Melchior 在上，Balthasar/Casper 在下）
 //   - 翻转动画完成后验证块才浮现
 //   - 验证通过后下方浮现"這裡沒有逆模因部"（浮动在验证框下方，不挤开布局）
-//   - 点击后标题上移过渡到主界面
+//   - 点击后：NERV 标志 + 三贤者 + 数字 + 按钮全部淡出
+//   - MAGI SYSTEM 标题放大到屏幕中央浮现
+//   - 下方打字机效果输出 "COMPLETE"
+//   - 然后进入主界面
 // ============================================================
 
 "use client";
@@ -76,7 +79,8 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
   ]);
   const [showTouch, setShowTouch] = useState(false);
   const [appearPhase, setAppearPhase] = useState<"hidden" | "appearing" | "visible">("hidden");
-  const [transitionPhase, setTransitionPhase] = useState<"none" | "fade-out" | "title-up" | "done">("none");
+  const [transitionPhase, setTransitionPhase] = useState<"none" | "hiding" | "reveal" | "typing" | "done">("none");
+  const [completeText, setCompleteText] = useState("");
   const verifyStartedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
@@ -197,14 +201,30 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
 
   // 处理点击"这里没有逆模因部"
   const handleTouch = useCallback(() => {
-    setTransitionPhase("fade-out");
+    // Phase 1: 所有元素淡出（NERV 标志、三贤者、数字、按钮）— 400ms
+    setTransitionPhase("hiding");
     setTimeout(() => {
-      setTransitionPhase("title-up");
+      // Phase 2: MAGI SYSTEM 从原来位置上移到顶端 — 500ms
+      setTransitionPhase("reveal");
       setTimeout(() => {
-        setTransitionPhase("done");
-        onCompleteRef.current();
-      }, 800);
-    }, 600);
+        // Phase 3: 打字机效果输出 COMPLETE（加速，80ms/字）
+        setTransitionPhase("typing");
+        const word = "COMPLETE";
+        let i = 0;
+        const typeTimer = setInterval(() => {
+          i++;
+          setCompleteText(word.slice(0, i));
+          if (i >= word.length) {
+            clearInterval(typeTimer);
+            // Phase 4: 完成，立刻进入主界面（主界面元素浮现由主界面自身控制）
+            setTimeout(() => {
+              setTransitionPhase("done");
+              onCompleteRef.current();
+            }, 200);
+          }
+        }, 80);
+      }, 500);
+    }, 400);
   }, []);
 
   // 渲染数字列
@@ -319,64 +339,86 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
 
       {/* 中间 */}
       <div className="flex-1 flex flex-col items-center overflow-hidden">
-        {/* NERV 标志 + MAGI SYSTEM 标题（一起翻转进入） */}
-        <div style={getAppearStyle(0)}>
-          {/* NERV 标志 */}
+        {/* NERV 标志 — 翻转进入，hiding 阶段淡出 */}
+        <div
+          style={{
+            ...getAppearStyle(0),
+            opacity:
+              transitionPhase === "none"
+                ? getAppearStyle(0).opacity
+                : 0,
+            transition:
+              transitionPhase === "none"
+                ? `all 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0s`
+                : "opacity 0.4s ease-out",
+          }}
+        >
           <div
             className="flex flex-col items-center shrink-0"
-            style={{
-              marginTop: "clamp(20px, 4vh, 60px)",
-              opacity: transitionPhase === "fade-out" || transitionPhase === "title-up" ? 0 : 1,
-              transition: "opacity 0.6s ease-out",
-            }}
+            style={{ marginTop: "clamp(20px, 4vh, 60px)" }}
           >
             <img src="/nerv-emblem.svg" alt="NERV" className="select-none pointer-events-none" style={{ width: "min(30vw, 25vh)", height: "min(30vw, 25vh)", color: NERV_RED }} />
           </div>
-
-          {/* MAGI SYSTEM 标题 */}
-          <div
-            className="font-black text-center tracking-[-0.05em] leading-none shrink-0"
-            style={{
-              color: NERV_RED,
-              fontSize: "clamp(2rem, 6vw, 5rem)",
-              marginTop: transitionPhase === "title-up" || transitionPhase === "done" ? "clamp(8px, 1.5vh, 20px)" : "clamp(12px, 2vh, 24px)",
-              marginBottom: transitionPhase === "title-up" || transitionPhase === "done" ? "0" : "clamp(16px, 3vh, 40px)",
-              transition: "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
-              opacity: transitionPhase === "fade-out" ? 0 : 1,
-            }}
-          >
-            MAGI SYSTEM
-          </div>
         </div>
 
-        {/* 三贤者验证块 — 三角形排列（翻转完成后才浮现） */}
+        {/* MAGI SYSTEM 标题 — 始终渲染，通过 transition 平滑移动 */}
+        <div
+          className="font-black text-center tracking-[-0.05em] leading-none shrink-0"
+          style={{
+            color: NERV_RED,
+            fontSize: "clamp(2rem, 6vw, 5rem)",
+            // 从原来位置（none/hiding）平滑上移到顶端（reveal/typing/done）
+            marginTop:
+              transitionPhase === "none" || transitionPhase === "hiding"
+                ? "clamp(12px, 2vh, 24px)"
+                : "clamp(8px, 1.5vh, 20px)",
+            marginBottom:
+              transitionPhase === "none" || transitionPhase === "hiding"
+                ? "clamp(16px, 3vh, 40px)"
+                : 0,
+            opacity:
+              transitionPhase === "none"
+                ? getAppearStyle(0.1).opacity
+                : transitionPhase === "hiding"
+                  ? 0
+                  : 1,
+            transition: "all 0.5s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          MAGI SYSTEM
+        </div>
+
+        {/* 三贤者验证块 — 翻转完成后才浮现，hiding 阶段淡出 */}
         <div
           className="flex flex-col items-center justify-center"
           style={{
             ...getBlocksAppearStyle(),
+            opacity:
+              transitionPhase === "none"
+                ? getBlocksAppearStyle().opacity
+                : 0,
+            transition: "all 0.4s ease-out",
           }}
         >
-          {/* 上层：Melchior */}
           <div className="mb-5">
             {renderVerifyBlock(blocks[0], 0)}
           </div>
-          {/* 下层：Balthasar + Casper */}
           <div className="flex flex-row items-center justify-center gap-10">
             {renderVerifyBlock(blocks[1], 1)}
             {renderVerifyBlock(blocks[2], 2)}
           </div>
         </div>
 
-        {/* "這裡沒有逆模因部" — 验证完成后浮动在距底边 1/3 处，不挤开布局 */}
+        {/* "這裡沒有逆模因部" — 验证完成后浮动显示 */}
         <div
           className="flex flex-col items-center justify-center"
           style={{
-            opacity: showTouch ? 1 : 0,
-            transition: "all 0.6s ease-out",
-            pointerEvents: showTouch ? "auto" : "none",
+            opacity: showTouch && transitionPhase === "none" ? 1 : 0,
+            transition: "all 0.4s ease-out",
+            pointerEvents: showTouch && transitionPhase === "none" ? "auto" : "none",
             height: 0,
             overflow: "visible",
-            transform: showTouch ? "translateY(120px)" : "translateY(100px)",
+            transform: showTouch && transitionPhase === "none" ? "translateY(120px)" : "translateY(100px)",
           }}
         >
           <button
@@ -397,6 +439,45 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
             這裡沒有逆模因部
           </button>
         </div>
+
+        {/* COMPLETE 打字机效果 — 在 reveal/typing/done 阶段占据屏幕中央 */}
+        {(transitionPhase === "reveal" || transitionPhase === "typing" || transitionPhase === "done") && (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center">
+              <span
+                className="font-black text-center tracking-[0.1em] leading-none"
+                style={{
+                  color: SKY_BLUE,
+                  fontSize: "clamp(2.5rem, 8vw, 7rem)",
+                  fontFamily: "'Matisse Pro', 'Noto Sans SC', sans-serif",
+                  textShadow: `0 0 10px ${SKY_BLUE}, 0 0 20px ${SKY_BLUE}`,
+                  // reveal 阶段 opacity 为 0（占位但不可见），typing 后逐渐显示
+                  opacity:
+                    transitionPhase === "reveal"
+                      ? 0
+                      : completeText.length > 0
+                        ? 1
+                        : 0,
+                  transition: "opacity 0.3s ease-out",
+                }}
+              >
+                {completeText}
+                {/* 打字机光标 */}
+                {completeText.length < 8 && transitionPhase === "typing" && (
+                  <span
+                    style={{
+                      color: SKY_BLUE,
+                      animation: "cursor-blink 0.8s step-end infinite",
+                      marginLeft: "2px",
+                    }}
+                  >
+                    ▊
+                  </span>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 右侧数字 */}
