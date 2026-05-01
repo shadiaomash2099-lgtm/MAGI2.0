@@ -21,17 +21,17 @@ export function BootTransition() {
           <line x1="60" y1="20" x2="60" y2="100" stroke="currentColor" strokeWidth="2" />
           <line x1="20" y1="60" x2="100" y2="60" stroke="currentColor" strokeWidth="2" />
         </svg>
-        <div className="text-amber-500 text-4xl font-black text-center mt-3 tracking-[0.15em]">
+        <div className="text-amber-500 text-4xl font-black text-center mt-3 tracking-[-0.05em]">
           NERV
         </div>
       </div>
 
       {/* MAGI SYSTEM 放大淡入 */}
       <div className="animate-zoom-in text-center -mt-20">
-        <div className="text-amber-400 text-4xl md:text-5xl font-black tracking-[0.3em] animate-text-glow">
+        <div className="text-amber-400 text-4xl md:text-5xl font-black tracking-[-0.05em] animate-text-glow">
           MAGI SYSTEM
         </div>
-        <div className="text-amber-400/40 text-[16px] mt-4 tracking-[0.3em]">
+        <div className="text-amber-400/40 text-[16px] mt-4 tracking-[-0.05em]">
           SYSTEM READY
         </div>
       </div>

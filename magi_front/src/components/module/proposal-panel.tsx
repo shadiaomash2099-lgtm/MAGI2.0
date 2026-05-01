@@ -35,9 +35,27 @@ export function ProposalPanel({
 }: ProposalPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-3">
-      {/* 标题 */}
-      <div className="text-[16px] font-bold tracking-widest text-amber-400/80">
-        ▸ 提訴
+      {/* NERV 红色警告标题 — 斜向切割条纹 */}
+      <div className="relative py-1.5 text-center">
+        {/* 上条纹（z-index 高于 CRT 扫描线） */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[6px]"
+          style={{
+            zIndex: 20,
+            background: `repeating-linear-gradient(-45deg, #b91c1c 0px, #b91c1c 8px, transparent 8px, transparent 14px)`,
+          }}
+        />
+        {/* 下条纹（z-index 高于 CRT 扫描线） */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[6px]"
+          style={{
+            zIndex: 20,
+            background: `repeating-linear-gradient(135deg, #b91c1c 0px, #b91c1c 8px, transparent 8px, transparent 14px)`,
+          }}
+        />
+        <div className="text-[32px] font-bold tracking-[-0.05em] text-magi-nerv-red-bright">
+          提訴
+        </div>
       </div>
 
       {/* 话题输入 */}

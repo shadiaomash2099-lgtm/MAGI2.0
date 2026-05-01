@@ -43,6 +43,8 @@ export interface DebateState {
   isSummarized: boolean;
   /** 当前发言角色 */
   currentSpeaker: MagiRole | null;
+  /** 简明总结文本（点击总结后生成） */
+  summaryText: string;
 
   // ─── Actions ────────────────────────────────────────────
   setAppStage: (stage: AppStage) => void;
@@ -69,6 +71,8 @@ export interface DebateState {
   updateLastLog: (content: string) => void;
   /** 清空日志 */
   clearLogs: () => void;
+  /** 设置简明总结文本 */
+  setSummaryText: (text: string) => void;
 
   /** 重置整个辩论状态 */
   resetAll: () => void;
@@ -85,6 +89,7 @@ export const useDebateStore = create<DebateState>((set) => ({
   modelChoice: {},
   isSummarized: false,
   currentSpeaker: null,
+  summaryText: "",
 
   // ── Actions ──
   setAppStage: (stage) => set({ appStage: stage }),
@@ -152,6 +157,8 @@ export const useDebateStore = create<DebateState>((set) => ({
 
   clearLogs: () => set({ logLines: [] }),
 
+  setSummaryText: (text) => set({ summaryText: text }),
+
   resetAll: () =>
     set({
       units: DEFAULT_UNITS.map((u) => ({ ...u })),
@@ -160,5 +167,6 @@ export const useDebateStore = create<DebateState>((set) => ({
       isSummarized: false,
       topic: "",
       currentSpeaker: null,
+      summaryText: "",
     }),
 }));

@@ -44,6 +44,7 @@ export function useDebateController() {
     updateLastLog,
     clearLogs,
     resetAll,
+    setSummaryText,
   } = useDebateStore();
 
   const abortRef = useRef<AbortController | null>(null);
@@ -64,22 +65,26 @@ export function useDebateController() {
           break;
 
         case "start":
-          // 开始发言 → 切换发言人 + 创建日志条目
+          // 开始发言 → 切换发言人 + 日志只显示角色名，不显示逐字内容
           if (data.role) {
             setCurrentSpeaker(data.role);
             setUnitStatus(data.role, "speaking");
-            addLog(data.role, "");
+            const nameMap: Record<string, string> = {
+              melchior: "梅爾基奧",
+              balthasar: "巴爾薩澤",
+              casper: "卡斯珀",
+            };
+            addLog("sys", `${nameMap[data.role] || data.role} 發言中...`);
           }
           break;
 
         case "chunk":
-          // 内容块 → 追加到当前发言人 + 更新日志
+          // 内容块 → 追加到当前发言人（不更新日志，避免逐字输出）
           if (data.content) {
-            // 找到当前发言人
             const currentRole = useDebateStore.getState().currentSpeaker;
             if (currentRole) {
               appendUnitContent(currentRole, data.content);
-              updateLastLog(data.content);
+              // 不调用 updateLastLog，日志只显示角色名
             }
           }
           break;
@@ -101,7 +106,7 @@ export function useDebateController() {
   const handleEnd = useCallback(() => {
     setDebating(false);
     setCurrentSpeaker(null);
-    addLog("sys", ">>> 军机处回禀：本轮辩论已结案。等待用户下一步定夺。");
+    // 后端 SSE 会发送 "MAGI结论已完成" 的 sys 消息，前端不再重复添加
 
     // 构建辩论历史
     const state = useDebateStore.getState();
@@ -163,7 +168,7 @@ export function useDebateController() {
     debateHistoryRef.current = "";
     setDebating(true);
     setSummarized(false);
-    addLog("sys", `>>> 新议题已呈上：【${topic}】`);
+    // 后端 SSE 会发送 "新議題已呈上" 的 sys 消息，前端不再重复添加
 
     // 设置初始状态
     (["melchior", "balthasar", "casper"] as MagiRole[]).forEach((role) => {
@@ -186,9 +191,11 @@ export function useDebateController() {
   const continueDebate = useCallback(() => {
     if (!topic.trim()) return;
 
+    // 清除上一轮的三贤人内容和表态，重新开始
+    resetUnits();
     summarizedRolesRef.current = new Set();
     setDebating(true);
-    addLog("sys", ">>> 收到用户锦囊，基于历史战报开启新一轮推演...");
+    addLog("sys", "收到用户锦囊，基于历史战报开启新一轮推演...");
 
     (["melchior", "balthasar", "casper"] as MagiRole[]).forEach((role) => {
       setUnitStatus(role, "thinking");
@@ -211,14 +218,14 @@ export function useDebateController() {
   const handleSummarize = useCallback(async () => {
     if (!debateHistoryRef.current) return;
 
-    addLog("sys", ">>> 正在生成总结...");
+    addLog("sys", "正在生成总结...");
 
     try {
       const result = await fetchSummary(
         debateHistoryRef.current,
         topicRef.current
       );
-      addLog("sys", `>>> 总结: ${result.summary}`);
+      setSummaryText(result.summary);
       setSummarized(true);
 
       // 更新各贤人的表态
@@ -231,9 +238,9 @@ export function useDebateController() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "未知错误";
-      addLog("sys", `>>> 【總結失敗】${msg}`);
+      addLog("sys", `【總結失敗】${msg}`);
     }
-  }, [addLog, setSummarized, setUnitVerdict]);
+  }, [addLog, setSummarized, setUnitVerdict, setSummaryText]);
 
   // ── 话题输入处理 ─────────────────────────────────────────
   const handleTopicKeyDown = useCallback(

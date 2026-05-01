@@ -47,6 +47,8 @@ export function MagiPage() {
   const logLines = useDebateStore((s) => s.logLines);
   const units = useDebateStore((s) => s.units);
   const currentSpeaker = useDebateStore((s) => s.currentSpeaker);
+  const summaryText = useDebateStore((s) => s.summaryText);
+  const isSummarized = useDebateStore((s) => s.isSummarized);
 
   // 光标闪烁
   useEffect(() => {
@@ -68,7 +70,7 @@ export function MagiPage() {
         <div className="col-start-1 row-start-1 col-span-full row-span-full flex flex-col w-full h-full overflow-hidden">
           {/* MAGI SYSTEM 标题 */}
           <div className="flex items-center justify-center py-1.5 shrink-0">
-            <h1 className="text-amber-400 text-xl md:text-2xl font-black tracking-[0.15em] leading-none animate-text-glow">
+            <h1 className="text-amber-400 text-xl md:text-2xl font-black tracking-[-0.05em] leading-none animate-text-glow">
               MAGI SYSTEM
             </h1>
           </div>
@@ -122,7 +124,7 @@ export function MagiPage() {
                     />
                   </MagiUnit>
                 }
-                video={<VideoPanel logLines={logLines} />}
+                video={<VideoPanel summaryText={summaryText} isSummarized={isSummarized} />}
                 casper={
                   <MagiUnit
                     data={units[2]}
@@ -150,7 +152,7 @@ export function MagiPage() {
           </div>
 
           {/* 底部状态栏 */}
-          <div className="flex items-center justify-end px-3 py-1 text-[16px] text-amber-400/30 tracking-widest border-t border-amber-900/15 shrink-0">
+          <div className="flex items-center justify-end px-3 py-1 text-[16px] text-amber-400/30 tracking-[-0.05em] border-t border-amber-900/15 shrink-0">
             <span
               className={blink ? "opacity-60" : "opacity-0"}
               suppressHydrationWarning

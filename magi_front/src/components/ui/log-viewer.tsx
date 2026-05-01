@@ -40,10 +40,16 @@ export function LogViewer({ logLines }: LogViewerProps) {
       )}
       {logLines.map((entry) => (
         <div key={entry.id} className="flex gap-1.5">
-          <span className={`${ROLE_COLORS[entry.role] || "text-gray-300"} shrink-0`}>
-            {'<'}{entry.role}{'>'}
-          </span>
-          <span className="text-gray-300 break-all">{entry.content}</span>
+          {entry.role === "sys" ? (
+            <span className="text-gray-300 break-all">{entry.content}</span>
+          ) : (
+            <>
+              <span className={`${ROLE_COLORS[entry.role] || "text-gray-300"} shrink-0`}>
+                {'<'}{entry.role}{'>'}
+              </span>
+              <span className="text-gray-300 break-all">{entry.content}</span>
+            </>
+          )}
         </div>
       ))}
     </div>

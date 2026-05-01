@@ -51,6 +51,15 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
 
   // Casper 切角在左上角（polygon(12% 0%, ...)），flex-row-reverse 让角色名和模型选择器移到右侧避开切角
   const isCasper = data.role === "casper";
+  const isBalthasar = data.role === "balthasar";
+  const isMelchior = data.role === "melchior";
+
+  // 根据切角位置动态计算 padding，避免元素被切角遮挡
+  // Casper: 左上切角 12% → 标题栏左侧 padding 加大
+  // Balthasar: 右上切角 12% → 标题栏右侧 padding 加大
+  // Melchior: 底部左右切角在 12%/88% 处，中间区域完整，徽章居中不受影响
+  const titlePadding = isCasper ? "pl-[14%] pr-2" : isBalthasar ? "pr-[14%] pl-2" : "px-2";
+  const bottomPadding = "py-0.5";
 
   return (
     <div
@@ -59,8 +68,8 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
     >
       {/* 顶部信息栏: 角色名 + 模型选择器 + 状态指示器 */}
       {/* Casper 使用 flex-row-reverse：视觉上 [角色名] [模型选择器] [状态指示器] 从右到左，避开左上切角 */}
-      <div className={`flex ${isCasper ? "flex-row-reverse" : "flex-row"} items-center gap-2 px-2 py-1 border-b shrink-0 ${colors.borderBottom}`}>
-        <span className={`text-[16px] font-bold tracking-widest shrink-0 ${colors.text}`}>
+      <div className={`flex ${isCasper ? "flex-row-reverse" : "flex-row"} items-center gap-2 ${titlePadding} py-1 border-b shrink-0 ${colors.borderBottom}`}>
+        <span className={`text-[16px] font-bold tracking-[-0.05em] shrink-0 ${colors.text}`}>
           {ROLE_LABELS[data.role] || data.role.toUpperCase()}
         </span>
         <div className="flex-1 min-w-0">
@@ -71,11 +80,11 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
         </div>
       </div>
 
-      {/* 内容区 */}
+      {/* 内容区 — 根据切角位置调整 padding，避免内容被切角遮挡 */}
       <div
-        className={`flex-1 overflow-y-auto p-2 text-[16px] leading-relaxed text-gray-300 scrollbar-thin markdown-content ${
+        className={`flex-1 overflow-y-auto text-[16px] leading-relaxed text-gray-300 scrollbar-thin markdown-content ${
           data.status === "speaking" ? "animate-lcl" : ""
-        }`}
+        } ${isCasper ? "pl-[14%] pr-2 pt-2 pb-2" : isBalthasar ? "pr-[14%] pl-2 pt-2 pb-2" : "p-2"}`}
       >
         {data.content ? (
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -90,8 +99,8 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
         )}
       </div>
 
-      {/* 底部: 表态徽章 */}
-      <div className={`flex items-center gap-2 px-2 py-1 border-t shrink-0 ${colors.borderTop}`}>
+      {/* 底部: 表态徽章 — 居中显示，根据切角位置调整 padding */}
+      <div className={`flex items-center justify-center gap-2 px-2 ${bottomPadding} border-t shrink-0 ${colors.borderTop}`}>
         <VerdictBadge verdict={data.verdict} />
       </div>
     </div>

@@ -54,15 +54,15 @@ async def stream_debate(request: DebateRequest):
         is_continue = bool(history)
 
         if is_continue:
-            yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional(f'>>> 收到用户锦囊：【{directive}】，基于历史战报开启新一轮推演...')})}\n\n"
+            yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional(f'收到用户锦囊：【{directive}】，基于历史战报开启新一轮推演...')})}\n\n"
             # 给梅尔基奥尔下达包含历史和锦囊的“连环计”
             topic_for_melchior = f"原议题：{topic}\n\n【此前多方的历史辩论记录】：\n{history}\n\n【用户最新最高指示】：{directive}\n\n请你作为梅尔基奥尔，严格顺着用户的最新指示，结合历史记录，抛出你新一轮的结构主义暴论！"
         else:
-            yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional(f'>>> 新议题已呈上：【{topic}】 (编制：{tier.upper()})')})}\n\n"
+            yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional(f'新议题已呈上：【{topic}】')})}\n\n"
             topic_for_melchior = topic
 
         # ---------------- 1. 梅尔基奥尔上阵 ----------------
-        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('>>> [梅尔基奥尔] ...')})}\n\n"
+        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('[梅尔基奥尔] ...')})}\n\n"
         yield f"data: {json.dumps({'type': 'start', 'role': 'melchior'})}\n\n"
         ans_m = ""
         for chunk in stream_call_agent("melchior", MELCHIOR_PROMPT, topic_for_melchior, tier, model_choice.get("melchior")):
@@ -74,7 +74,7 @@ async def stream_debate(request: DebateRequest):
             yield f"data: {json.dumps({'type': 'verdict', 'role': 'melchior', 'verdict': to_hk_traditional(verdict_m.group(1))})}\n\n"
 
         # ---------------- 2. 巴尔塔萨上阵 ----------------
-        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('>>> [巴尔塔萨] ...')})}\n\n"
+        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('[巴尔塔萨] ...')})}\n\n"
         yield f"data: {json.dumps({'type': 'start', 'role': 'balthasar'})}\n\n"
         if is_continue:
             attack_topic = f"原议题：{topic}。用户刚刚下达了指示：{directive}。基于此，梅尔基奥尔刚刚大放厥词：{ans_m}。请你从巴尔塔萨的角度，反驳梅尔基奥尔的冰冷推演。"
@@ -91,7 +91,7 @@ async def stream_debate(request: DebateRequest):
             yield f"data: {json.dumps({'type': 'verdict', 'role': 'balthasar', 'verdict': to_hk_traditional(verdict_b.group(1))})}\n\n"
 
         # ---------------- 3. 卡斯帕上阵 ----------------
-        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('>>> [卡斯帕] :')})}\n\n"
+        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('[卡斯帕] :')})}\n\n"
         yield f"data: {json.dumps({'type': 'start', 'role': 'casper'})}\n\n"
         if is_continue:
             mad_topic = f"原议题：{topic}。用户指示：{directive}。针对用户的指示，梅尔基奥尔说：{ans_m}。巴尔塔萨反驳：{ans_b}。请你嘲笑他们两人的迂腐，给出破坏性的暴论！"
@@ -108,7 +108,7 @@ async def stream_debate(request: DebateRequest):
             yield f"data: {json.dumps({'type': 'verdict', 'role': 'casper', 'verdict': to_hk_traditional(verdict_c.group(1))})}\n\n"
 
         # 收兵
-        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('>>> 军机处回禀：本轮辩论已结案。等待用户下一步定夺。')})}\n\n"
+        yield f"data: {json.dumps({'type': 'sys', 'content': to_hk_traditional('MAGI结论已完成')})}\n\n"
         yield "event: end\ndata: {}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

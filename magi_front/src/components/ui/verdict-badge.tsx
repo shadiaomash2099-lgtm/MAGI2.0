@@ -19,15 +19,15 @@ const VERDICT_CONFIG: Record<
 > = {
   承認: {
     label: "承認",
-    className: "bg-green-900/40 text-green-400 border-green-500/30",
+    className: "text-green-400",
   },
   否認: {
     label: "否認",
-    className: "bg-amber-900/40 text-amber-400 border-amber-500/30",
+    className: "text-red-500",
   },
   疑慮: {
     label: "疑慮",
-    className: "bg-yellow-900/40 text-yellow-400 border-yellow-500/30",
+    className: "text-yellow-400",
   },
 };
 
@@ -36,9 +36,22 @@ export function VerdictBadge({ verdict }: VerdictBadgeProps) {
 
   const config = VERDICT_CONFIG[verdict];
 
+  // 防御：如果 verdict 不在配置中（如后端返回了简体或异常值），直接显示原文
+  if (!config) {
+    return (
+      <span
+        className="inline-block text-[26px] font-bold text-gray-300"
+        style={{ zIndex: 20, position: "relative" }}
+      >
+        {verdict}
+      </span>
+    );
+  }
+
   return (
     <span
-      className={`inline-block px-1.5 py-0.5 text-[16px] font-bold border rounded-sm ${config.className}`}
+      className={`inline-block text-[26px] font-bold ${config.className}`}
+      style={{ zIndex: 20, position: "relative" }}
     >
       {config.label}
     </span>

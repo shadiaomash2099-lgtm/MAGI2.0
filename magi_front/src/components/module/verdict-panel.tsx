@@ -23,8 +23,27 @@ const ROLE_LABELS: Record<string, string> = {
 export function VerdictPanel({ units }: VerdictPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
-      <div className="text-[16px] font-bold tracking-widest text-amber-400/80">
-        ▸ 決議
+      {/* NERV 红色警告标题 — 斜向切割条纹 */}
+      <div className="relative py-1.5 text-center">
+        {/* 上条纹（z-index 高于 CRT 扫描线） */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[6px]"
+          style={{
+            zIndex: 20,
+            background: `repeating-linear-gradient(-45deg, #b91c1c 0px, #b91c1c 8px, transparent 8px, transparent 14px)`,
+          }}
+        />
+        {/* 下条纹（z-index 高于 CRT 扫描线） */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[6px]"
+          style={{
+            zIndex: 20,
+            background: `repeating-linear-gradient(135deg, #b91c1c 0px, #b91c1c 8px, transparent 8px, transparent 14px)`,
+          }}
+        />
+        <div className="text-[32px] font-bold tracking-[-0.05em] text-magi-nerv-red-bright">
+          決議
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -33,7 +52,7 @@ export function VerdictPanel({ units }: VerdictPanelProps) {
             key={unit.role}
             className="flex items-center justify-between px-2 py-1.5 border border-amber-900/10 bg-black/20"
           >
-            <span className="text-[16px] font-bold tracking-wider text-amber-400/80">
+            <span className="text-[16px] font-bold tracking-[-0.05em] text-amber-400/80">
               {ROLE_LABELS[unit.role]}
             </span>
             <VerdictBadge verdict={unit.verdict} />

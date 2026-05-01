@@ -102,7 +102,7 @@ export function MagiGrid({
       <div style={{ gridArea: "balthasar" }} className="relative overflow-hidden">
         {balthasar}
       </div>
-      <div style={{ gridArea: "video" }} className="relative overflow-hidden">
+      <div style={{ gridArea: "video", maxHeight: "80%" }} className="relative overflow-hidden">
         {video}
       </div>
       <div style={{ gridArea: "casper" }} className="relative overflow-hidden">
