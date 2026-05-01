@@ -55,6 +55,23 @@ export function MagiGrid({
         `,
       }}
     >
+      {/* SVG 连接线 — 覆盖在 Grid 之上，使用 grid-area 跨越所有单元格 */}
+      <svg
+        className="pointer-events-none z-10 w-full h-full opacity-30"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        style={{ gridArea: "1 / 1 / -1 / -1", mixBlendMode: "screen" }}
+      >
+        <g stroke="var(--magi-amber, #c0843c)" strokeWidth="0.3" fill="none">
+          {/* Melchior(中上) → Balthasar(左下) */}
+          <line x1="50" y1="30" x2="18" y2="72" />
+          {/* Balthasar(左下) → Casper(右下) */}
+          <line x1="18" y1="72" x2="82" y2="72" />
+          {/* Casper(右下) → Melchior(中上) */}
+          <line x1="82" y1="72" x2="50" y2="30" />
+        </g>
+      </svg>
+
       <div style={{ gridArea: "proposal" }} className="relative overflow-hidden">
         {proposal}
       </div>
