@@ -17,7 +17,7 @@ const STATUS_CONFIG: Record<
 > = {
   idle: {
     label: "STANDBY",
-    className: "text-gray-500",
+    className: "text-cyan-400/70",
   },
   thinking: {
     label: "ANALYZING",
@@ -29,7 +29,7 @@ const STATUS_CONFIG: Record<
   },
   done: {
     label: "COMPLETE",
-    className: "text-amber-400",
+    className: "text-cyan-400",
   },
 };
 

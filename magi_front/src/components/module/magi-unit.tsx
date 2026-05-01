@@ -32,18 +32,31 @@ const ROLE_LABELS: Record<string, string> = {
   casper: "CASPER·3 — 女人的視點",
 };
 
+/** 根据状态返回颜色类名：idle/done→天蓝色实底, thinking/speaking→LCL黄色实底 */
+function statusColors(status: string) {
+  const isActive = status === "thinking" || status === "speaking";
+  return {
+    bg: isActive ? "bg-amber-900" : "bg-cyan-900",
+    border: isActive ? "border-amber-700/30" : "border-cyan-700/25",
+    borderBottom: isActive ? "border-amber-700/15" : "border-cyan-700/10",
+    borderTop: isActive ? "border-amber-700/15" : "border-cyan-700/10",
+    text: isActive ? "text-amber-400/80" : "text-cyan-400/70",
+  };
+}
+
 export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps) {
   const statusTopClass =
     statusPos === "top-right" ? "right-2" : "left-2";
+  const colors = statusColors(data.status);
 
   return (
     <div
-      className="relative w-full h-full flex flex-col border border-amber-900/20 bg-black/40 crt-screen"
+      className={`relative w-full h-full flex flex-col border crt-screen ${colors.bg} ${colors.border}`}
       style={{ clipPath }}
     >
       {/* 顶部信息栏 */}
-      <div className="flex items-center justify-between px-2 py-1 border-b border-amber-900/10 shrink-0">
-        <span className="text-[8px] font-bold tracking-widest text-amber-400/80">
+      <div className={`flex items-center justify-between px-2 py-1 border-b shrink-0 ${colors.borderBottom}`}>
+        <span className={`text-[8px] font-bold tracking-widest ${colors.text}`}>
           {ROLE_LABELS[data.role] || data.role.toUpperCase()}
         </span>
         <div className={`absolute ${statusTopClass} top-1`}>
@@ -71,7 +84,7 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
       </div>
 
       {/* 底部: 表态徽章 + 自定义内容 */}
-      <div className="flex items-center gap-2 px-2 py-1 border-t border-amber-900/10 shrink-0">
+      <div className={`flex items-center gap-2 px-2 py-1 border-t shrink-0 ${colors.borderTop}`}>
         <VerdictBadge verdict={data.verdict} />
         {children}
       </div>
