@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-eva: 'Matisse Pro', 'Noto Sans SC', sans-serif;
+}
+
 /* ============================================================
    MAGI2.0 — 全局样式
    NERV 红色主题 — EVA 风格
