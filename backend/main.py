@@ -41,6 +41,21 @@ class UnitSummarizeRequest(BaseModel):
     content: str            # 该角色的完整发言内容
     topic: str              # 原议题
 
+class HealthCheckRequest(BaseModel):
+    role: str               # 角色名称（default/melchior/balthasar/casper）
+
+@app.post("/api/health")
+async def health_check(request: HealthCheckRequest):
+    """
+    轻量级连接验证：尝试调用对应角色的 AI 模型，返回连接状态。
+    用于启动序列中的三贤者验证环节。
+    """
+    try:
+        result = _call_agent(request.role, "请回复OK", "", "lite")
+        return {"status": "ok", "role": request.role}
+    except Exception as e:
+        return {"status": "error", "role": request.role, "message": str(e)}
+
 @app.post("/api/stream_debate")
 async def stream_debate(request: DebateRequest):
     topic = request.topic

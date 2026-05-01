@@ -1,23 +1,37 @@
 // ============================================================
-// MAGI2.0 — 启动序列：NERV 加载阶段
+// MAGI2.0 — 启动序列：MAGI SYSTEM 验证阶段
 // 规则 R5: ≤ 100 行
 // 规则 R2: 无 position: absolute/fixed
 //
 // 设计说明:
-//   - NERV 标志巨大化、反转出现，占满屏幕
-//   - 左右红色渐变遮罩（100% → 0% 透明度），不挤占中间标志
-//   - 大量独立数字实体铺满左右两侧，每个数字自身会变化（跳跃感）
-//   - 七段数码管风格（Courier New + text-shadow 发光）
-//   - 进度条 + 8 个随机数字滚动
-//   - 加载完成后需任意键盘输入才进入下一阶段
+//   - NERV 标志 + MAGI SYSTEM 标题固定在顶部，翻转进入
+//   - 左右浮动数字系统保留（七段数码管风格）
+//   - 移除进度条、数字滚动、anykey 提示
+//   - 三贤者验证块呈三角形排列（Melchior 在上，Balthasar/Casper 在下）
+//   - 翻转动画完成后验证块才浮现
+//   - 验证通过后下方浮现"這裡沒有逆模因部"（浮动在验证框下方，不挤开布局）
+//   - 点击后标题上移过渡到主界面
 // ============================================================
 
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { healthCheck } from "@/lib/api";
 
 const NERV_RED = "#DA291C";
 const DARK_RED = "#8B0000";
+const YELLOW_BORDER = "#c0843c";
+const SKY_BLUE = "#00d4ff";
+const BLUE_BG = "rgba(0,100,200,0.15)";
+const SKY_BLUE_BG = "rgba(0,212,255,0.3)";
+
+type BlockStatus = "pending" | "verifying" | "verified" | "error";
+
+interface VerifyBlock {
+  role: string;
+  label: string;
+  status: BlockStatus;
+}
 
 interface DigitCell {
   id: number;
@@ -31,13 +45,12 @@ interface BootNervLoadingProps {
   onComplete: () => void;
 }
 
-// 生成一组数字实体
 function createDigitGroup(cols: number, rows: number, idRef: React.MutableRefObject<number>): DigitCell[] {
   const group: DigitCell[] = [];
   for (let col = 0; col < cols; col++) {
     for (let row = 0; row < rows; row++) {
       const id = idRef.current++;
-      const size = 8 + Math.floor(Math.random() * 29); // 8px ~ 36px
+      const size = 8 + Math.floor(Math.random() * 29);
       const delay = Math.random() * 3000;
       group.push({ id, col, row, size, delay });
     }
@@ -46,11 +59,7 @@ function createDigitGroup(cols: number, rows: number, idRef: React.MutableRefObj
 }
 
 export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
-  const [progress, setProgress] = useState(0);
-  const [numberRolls, setNumberRolls] = useState<string[]>([]);
-  const [loaded, setLoaded] = useState(false);
-
-  // 每个数字层独立的数据
+  // 数字系统
   const [leftGroups, setLeftGroups] = useState<DigitCell[][]>([]);
   const [rightGroups, setRightGroups] = useState<DigitCell[][]>([]);
   const [digitValues, setDigitValues] = useState<Record<number, string>>({});
@@ -59,11 +68,33 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
   const digitValuesRef = useRef<Record<number, string>>({});
   const digitOffsetsRef = useRef<Record<number, number>>({});
 
+  // 三贤者验证块 — 三角形排列（Melchior 上，Balthasar/Casper 下）
+  const [blocks, setBlocks] = useState<VerifyBlock[]>([
+    { role: "melchior", label: "MELCHIOR", status: "pending" },
+    { role: "balthasar", label: "BALTHASAR", status: "pending" },
+    { role: "casper", label: "CASPER", status: "pending" },
+  ]);
+  const [showTouch, setShowTouch] = useState(false);
+  const [appearPhase, setAppearPhase] = useState<"hidden" | "appearing" | "visible">("hidden");
+  const [transitionPhase, setTransitionPhase] = useState<"none" | "fade-out" | "title-up" | "done">("none");
+  const verifyStartedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
   const COLS = 5;
   const ROWS = 16;
-  const LAYERS = 4; // 原内容 + 3个复制层
+  const LAYERS = 4;
 
-  // 初始化所有数字层 + 随机初始偏移
+  // 进入翻转动画
+  useEffect(() => {
+    setAppearPhase("appearing");
+    const timer = setTimeout(() => {
+      setAppearPhase("visible");
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 初始化数字层
   useEffect(() => {
     const leftLayers: DigitCell[][] = [];
     const rightLayers: DigitCell[][] = [];
@@ -93,9 +124,12 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
     setDigitOffsets(offsets);
   }, []);
 
-  // 数字值变化 + 上下偏移跳变（连续浮动感，无 transition 实现跳跃）
+  // 数字跳动
   useEffect(() => {
-    const allDigits = [...leftGroups.flat(), ...rightGroups.flat()];
+    const allLeft = leftGroups.flat();
+    const allRight = rightGroups.flat();
+    if (allLeft.length === 0 && allRight.length === 0) return;
+    const allDigits = [...allLeft, ...allRight];
     const timers: ReturnType<typeof setTimeout>[] = [];
 
     allDigits.forEach((d) => {
@@ -103,12 +137,9 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
         const nextVal = Math.floor(Math.random() * 10).toString();
         digitValuesRef.current[d.id] = nextVal;
         setDigitValues((prev) => ({ ...prev, [d.id]: nextVal }));
-
-        // 随机上下偏移 -15px ~ +15px，无 transition 实现跳跃感
         const nextOffset = (Math.random() - 0.5) * 30;
         digitOffsetsRef.current[d.id] = nextOffset;
         setDigitOffsets((prev) => ({ ...prev, [d.id]: nextOffset }));
-
         const nextDelay = 150 + Math.random() * 450;
         timers.push(setTimeout(tick, nextDelay));
       };
@@ -116,49 +147,65 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
     });
 
     return () => timers.forEach(clearTimeout);
-  }, [leftGroups, rightGroups]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leftGroups.length > 0, rightGroups.length > 0]);
 
-  // 进度条递增 + 数字滚动
+  // 验证流程 — 等待翻转动画完成后才开始
   useEffect(() => {
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        const next = prev + 5;
-        if (next >= 100) {
-          clearInterval(progressInterval);
-          clearInterval(numberInterval);
-          setLoaded(true);
-          return 100;
+    if (verifyStartedRef.current) return;
+    verifyStartedRef.current = true;
+
+    const verifyRole = async (role: string, blockIdx: number): Promise<boolean> => {
+      setBlocks((prev) => prev.map((b, i) => (i === blockIdx ? { ...b, status: "verifying" } : b)));
+      await new Promise((r) => setTimeout(r, 300));
+      try {
+        const result = await healthCheck(role);
+        if (result.status === "ok") {
+          setBlocks((prev) => prev.map((b, i) => (i === blockIdx ? { ...b, status: "verified" } : b)));
+          return true;
+        } else {
+          setBlocks((prev) => prev.map((b, i) => (i === blockIdx ? { ...b, status: "error" } : b)));
+          return false;
         }
-        return next;
-      });
-    }, 75);
-
-    const numberInterval = setInterval(() => {
-      setNumberRolls((prev) =>
-        prev.map(() =>
-          Math.floor(Math.random() * 100).toString().padStart(2, "0")
-        )
-      );
-    }, 200);
-
-    return () => {
-      clearInterval(progressInterval);
-      clearInterval(numberInterval);
+      } catch {
+        setBlocks((prev) => prev.map((b, i) => (i === blockIdx ? { ...b, status: "error" } : b)));
+        return false;
+      }
     };
+
+    const runSequence = async () => {
+      // 等待翻转动画完成（1.2s）后再等 300ms 让验证块浮现
+      await new Promise((r) => setTimeout(r, 1500));
+
+      // 1. Melchior（上）
+      await verifyRole("melchior", 0);
+      await new Promise((r) => setTimeout(r, 500));
+
+      // 2. Balthasar（左下）
+      await verifyRole("balthasar", 1);
+      await new Promise((r) => setTimeout(r, 500));
+
+      // 3. Casper（右下）
+      await verifyRole("casper", 2);
+      await new Promise((r) => setTimeout(r, 500));
+
+      setShowTouch(true);
+    };
+
+    runSequence();
   }, []);
 
-  // 键盘输入
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (loaded) onComplete();
-    },
-    [loaded, onComplete]
-  );
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  // 处理点击"这里没有逆模因部"
+  const handleTouch = useCallback(() => {
+    setTransitionPhase("fade-out");
+    setTimeout(() => {
+      setTransitionPhase("title-up");
+      setTimeout(() => {
+        setTransitionPhase("done");
+        onCompleteRef.current();
+      }, 800);
+    }, 600);
+  }, []);
 
   // 渲染数字列
   const renderDigitCol = (digits: DigitCell[], colIdx: number) => (
@@ -185,8 +232,6 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
     </div>
   );
 
-  // 渲染一组数字列（可复用，带偏移）
-  // 使用 grid 布局使多个 group 重叠在同一区域，避免 position: absolute
   const renderDigitGroup = (digits: DigitCell[], dx: number = 0, dy: number = 0) => (
     <div
       className="flex flex-row items-stretch pointer-events-none"
@@ -195,118 +240,172 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
         minWidth: "20vw",
         height: "100%",
         transform: `translate(${dx}px, ${dy}px)`,
+        opacity: transitionPhase === "none" ? 1 : 0,
+        transition: "opacity 0.6s ease-out",
       }}
     >
       {Array.from({ length: 5 }, (_, i) => renderDigitCol(digits, i))}
     </div>
   );
 
-  return (
-    <div className="w-full h-full flex flex-row items-stretch overflow-hidden bg-black nerv-loading-container">
+  const getBlockStyle = (status: BlockStatus) => {
+    switch (status) {
+      case "pending":
+        return { borderColor: YELLOW_BORDER, backgroundColor: BLUE_BG, boxShadow: "none" };
+      case "verifying":
+        return { borderColor: YELLOW_BORDER, backgroundColor: BLUE_BG, animation: "verify-blink 0.6s ease-in-out infinite" };
+      case "verified":
+        return { borderColor: SKY_BLUE, backgroundColor: SKY_BLUE_BG, boxShadow: `0 0 8px ${SKY_BLUE}` };
+      case "error":
+        return { borderColor: "#ff3333", backgroundColor: "rgba(255, 50, 50, 0.15)", boxShadow: "none" };
+    }
+  };
 
-      {/* 左侧数字区域 — 原内容 + 复制偏移层 */}
-      {/* 使用 grid 布局使多个 group 重叠在同一区域 */}
+  const renderVerifyBlock = (block: VerifyBlock, index: number) => {
+    const style = getBlockStyle(block.status);
+    return (
       <div
-        className="grid pointer-events-none"
+        key={block.role}
+        className="flex flex-col items-center justify-center px-8 py-12"
         style={{
-          width: "20vw",
-          minWidth: "20vw",
-          height: "100%",
-          gridTemplateColumns: "1fr",
-          gridTemplateRows: "1fr",
+          width: "260px",
+          border: `2px solid ${style.borderColor}`,
+          backgroundColor: style.backgroundColor,
+          boxShadow: style.boxShadow,
+          animation: style.animation || "none",
+          transition: "all 0.5s ease-out",
+          transitionDelay: `${index * 0.1}s`,
         }}
       >
+        <div
+          className="font-black text-[28px] tracking-[-0.05em] leading-none"
+          style={{
+            color: block.status === "verified" ? SKY_BLUE : block.status === "error" ? "#ff3333" : YELLOW_BORDER,
+            transition: "color 0.5s ease-out",
+          }}
+        >
+          {block.label}
+        </div>
+      </div>
+    );
+  };
+
+  // 翻转动画样式
+  const getAppearStyle = (delay: number = 0) => ({
+    opacity: appearPhase === "hidden" ? 0 : 1,
+    transform:
+      appearPhase === "hidden"
+        ? "rotateX(180deg) scale(0.3)"
+        : "rotateX(0deg) scale(1)",
+    transition: `all 1.2s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s`,
+  });
+
+  // 验证块浮现样式 — 翻转完成后才显示
+  const getBlocksAppearStyle = () => ({
+    opacity: appearPhase === "visible" ? 1 : 0,
+    transform: appearPhase === "visible" ? "translateY(0)" : "translateY(30px)",
+    transition: "all 0.6s ease-out 0.3s",
+  });
+
+  return (
+    <div className="w-full h-full flex flex-row items-stretch overflow-hidden bg-black nerv-loading-container">
+      {/* 左侧数字 */}
+      <div className="grid pointer-events-none" style={{ width: "20vw", minWidth: "20vw", height: "100%", gridTemplateColumns: "1fr", gridTemplateRows: "1fr" }}>
         <div className="col-start-1 row-start-1">{renderDigitGroup(leftGroups[0] ?? [], 0, 0)}</div>
         <div className="col-start-1 row-start-1">{renderDigitGroup(leftGroups[1] ?? [], 20, 8)}</div>
         <div className="col-start-1 row-start-1">{renderDigitGroup(leftGroups[2] ?? [], 40, -6)}</div>
         <div className="col-start-1 row-start-1">{renderDigitGroup(leftGroups[3] ?? [], 60, 12)}</div>
       </div>
 
-      {/* 中间主内容 */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        {/* NERV 标志 */}
-        <div className="animate-nerv-appear flex flex-col items-center">
-          <img
-            src="/nerv-emblem.svg"
-            alt="NERV"
-            className="select-none pointer-events-none"
-            style={{
-              width: "min(60vw, 60vh)",
-              height: "min(60vw, 60vh)",
-              color: NERV_RED,
-            }}
-          />
+      {/* 中间 */}
+      <div className="flex-1 flex flex-col items-center overflow-hidden">
+        {/* NERV 标志 + MAGI SYSTEM 标题（一起翻转进入） */}
+        <div style={getAppearStyle(0)}>
+          {/* NERV 标志 */}
           <div
-            className="font-black text-center mt-4 tracking-[-0.05em]"
+            className="flex flex-col items-center shrink-0"
+            style={{
+              marginTop: "clamp(20px, 4vh, 60px)",
+              opacity: transitionPhase === "fade-out" || transitionPhase === "title-up" ? 0 : 1,
+              transition: "opacity 0.6s ease-out",
+            }}
+          >
+            <img src="/nerv-emblem.svg" alt="NERV" className="select-none pointer-events-none" style={{ width: "min(30vw, 25vh)", height: "min(30vw, 25vh)", color: NERV_RED }} />
+          </div>
+
+          {/* MAGI SYSTEM 标题 */}
+          <div
+            className="font-black text-center tracking-[-0.05em] leading-none shrink-0"
             style={{
               color: NERV_RED,
               fontSize: "clamp(2rem, 6vw, 5rem)",
+              marginTop: transitionPhase === "title-up" || transitionPhase === "done" ? "clamp(8px, 1.5vh, 20px)" : "clamp(12px, 2vh, 24px)",
+              marginBottom: transitionPhase === "title-up" || transitionPhase === "done" ? "0" : "clamp(16px, 3vh, 40px)",
+              transition: "all 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+              opacity: transitionPhase === "fade-out" ? 0 : 1,
             }}
           >
-            NERV
+            MAGI SYSTEM
           </div>
         </div>
 
-        {/* 加载条 */}
-        <div className="w-[360px] mt-8">
-          <div className="flex h-[3px] bg-white/10 overflow-hidden">
-            <div
-              className="transition-all duration-75 ease-linear"
-              style={{ width: `${progress}%`, backgroundColor: NERV_RED }}
-            />
-          </div>
-          <div
-            className="text-[16px] text-right mt-2 font-mono tracking-[-0.05em]"
-            style={{ color: NERV_RED }}
-          >
-            {progress}%
-          </div>
-        </div>
-
-        {/* 数字滚动 */}
+        {/* 三贤者验证块 — 三角形排列（翻转完成后才浮现） */}
         <div
-          className="flex gap-3 font-mono text-[16px] opacity-70 mt-4"
-          style={{ color: NERV_RED }}
+          className="flex flex-col items-center justify-center"
+          style={{
+            ...getBlocksAppearStyle(),
+          }}
         >
-          {numberRolls.map((num, i) => (
-            <div
-              key={i}
-              className="animate-number-roll"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              {num}
-            </div>
-          ))}
+          {/* 上层：Melchior */}
+          <div className="mb-5">
+            {renderVerifyBlock(blocks[0], 0)}
+          </div>
+          {/* 下层：Balthasar + Casper */}
+          <div className="flex flex-row items-center justify-center gap-10">
+            {renderVerifyBlock(blocks[1], 1)}
+            {renderVerifyBlock(blocks[2], 2)}
+          </div>
         </div>
 
-        {/* 按任意键继续 */}
-        {loaded && (
-          <div
-            className="mt-8 text-[16px] font-mono tracking-[-0.05em] animate-pulse"
-            style={{ color: NERV_RED }}
+        {/* "這裡沒有逆模因部" — 验证完成后浮动在距底边 1/3 处，不挤开布局 */}
+        <div
+          className="flex flex-col items-center justify-center"
+          style={{
+            opacity: showTouch ? 1 : 0,
+            transition: "all 0.6s ease-out",
+            pointerEvents: showTouch ? "auto" : "none",
+            height: 0,
+            overflow: "visible",
+            transform: showTouch ? "translateY(120px)" : "translateY(100px)",
+          }}
+        >
+          <button
+            onClick={handleTouch}
+            className="cursor-pointer select-none animate-pulse hover:scale-110 transition-transform"
+            style={{
+              color: NERV_RED,
+              fontSize: "64px",
+              fontFamily: "'Matisse Pro', 'Noto Sans SC', sans-serif",
+              letterSpacing: "-0.1em",
+              fontWeight: "900",
+              background: "none",
+              border: "none",
+              padding: "12px 48px",
+              textShadow: `0 0 10px ${NERV_RED}, 0 0 20px ${NERV_RED}`,
+            }}
           >
-            PRESS ANY KEY TO CONTINUE
-          </div>
-        )}
+            這裡沒有逆模因部
+          </button>
+        </div>
       </div>
 
-      {/* 右侧数字区域 — 原内容 + 复制偏移层 */}
-      <div
-        className="grid pointer-events-none"
-        style={{
-          width: "20vw",
-          minWidth: "20vw",
-          height: "100%",
-          gridTemplateColumns: "1fr",
-          gridTemplateRows: "1fr",
-        }}
-      >
+      {/* 右侧数字 */}
+      <div className="grid pointer-events-none" style={{ width: "20vw", minWidth: "20vw", height: "100%", gridTemplateColumns: "1fr", gridTemplateRows: "1fr" }}>
         <div className="col-start-1 row-start-1">{renderDigitGroup(rightGroups[0] ?? [], 0, 0)}</div>
         <div className="col-start-1 row-start-1">{renderDigitGroup(rightGroups[1] ?? [], -20, 10)}</div>
         <div className="col-start-1 row-start-1">{renderDigitGroup(rightGroups[2] ?? [], -40, -8)}</div>
         <div className="col-start-1 row-start-1">{renderDigitGroup(rightGroups[3] ?? [], -60, 14)}</div>
       </div>
-
     </div>
   );
 }

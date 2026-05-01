@@ -68,9 +68,15 @@ export function MagiPage() {
       {/* 主界面 — 启动完成后显示 */}
       {bootComplete && (
         <div className="col-start-1 row-start-1 col-span-full row-span-full flex flex-col w-full h-full overflow-hidden">
-          {/* MAGI SYSTEM 标题 */}
+          {/* MAGI SYSTEM 标题 — 与启动层保持一致的红色+大小 */}
           <div className="flex items-center justify-center py-1.5 shrink-0">
-            <h1 className="text-amber-400 text-xl md:text-2xl font-black tracking-[-0.05em] leading-none animate-text-glow">
+            <h1
+              className="font-black tracking-[-0.05em] leading-none"
+              style={{
+                color: "#DA291C",
+                fontSize: "clamp(2rem, 6vw, 5rem)",
+              }}
+            >
               MAGI SYSTEM
             </h1>
           </div>

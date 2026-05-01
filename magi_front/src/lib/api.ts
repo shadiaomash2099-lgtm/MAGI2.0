@@ -151,3 +151,23 @@ export async function fetchUnitSummary(
 
   return response.json();
 }
+
+// ─── 健康检查 API ──────────────────────────────────────────
+/**
+ * 轻量级连接验证：向指定角色发送健康检查请求
+ * @param role 角色名称（default/melchior/balthasar/casper）
+ * @returns { status: "ok" | "error", role: string }
+ */
+export async function healthCheck(role: string): Promise<{ status: string; role: string }> {
+  const response = await fetch(`${API_BASE}/api/health`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  return response.json();
+}

@@ -593,6 +593,18 @@
 
 .animate-number-roll { animation: number-roll 0.3s ease-out forwards; }
 
+/* ─── 验证闪烁（蓝色呼吸） ─────────────────────────────── */
+@keyframes verify-blink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 4px rgba(0, 212, 255, 0.3);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.6);
+  }
+}
+
 
 /* ─── 选择文本颜色 ─────────────────────────────────────── */
 ::selection {
