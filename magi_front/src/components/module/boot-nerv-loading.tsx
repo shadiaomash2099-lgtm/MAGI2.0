@@ -88,13 +88,13 @@ export function BootNervLoading({ onComplete }: BootNervLoadingProps) {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <div className="text-amber-500 text-sm text-right mt-2 font-mono tracking-wider">
+        <div className="text-amber-500 text-[16px] text-right mt-2 font-mono tracking-wider">
           {progress}%
         </div>
       </div>
 
       {/* NERV 红色数字滚动 */}
-      <div className="flex gap-3 text-amber-500 font-mono text-xs opacity-70">
+      <div className="flex gap-3 text-amber-500 font-mono text-[16px] opacity-70">
         {numberRolls.map((num, i) => (
           <div
             key={i}

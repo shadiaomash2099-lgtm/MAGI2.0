@@ -31,7 +31,7 @@ export function BootTransition() {
         <div className="text-amber-400 text-4xl md:text-5xl font-black tracking-[0.3em] animate-text-glow">
           MAGI SYSTEM
         </div>
-        <div className="text-amber-400/40 text-sm mt-4 tracking-[0.3em]">
+        <div className="text-amber-400/40 text-[16px] mt-4 tracking-[0.3em]">
           SYSTEM READY
         </div>
       </div>

@@ -37,7 +37,7 @@ export function StatusIndicator({ status }: StatusIndicatorProps) {
   const config = STATUS_CONFIG[status];
 
   return (
-    <span className={`text-[8px] font-bold tracking-wider ${config.className}`}>
+    <span className={`text-[16px] font-bold tracking-wider ${config.className}`}>
       ▸ {config.label}
     </span>
   );

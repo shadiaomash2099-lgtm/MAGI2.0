@@ -162,7 +162,7 @@ export function BootScpLogo({ onProceed }: BootScpLogoProps) {
           FOUNDATION
         </div>
         <div
-          className={`text-white/40 text-xs tracking-[0.3em] transition-all duration-500 ${
+          className={`text-white/40 text-[16px] tracking-[0.3em] transition-all duration-500 ${
             lettersVisible >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
           style={{ transitionDelay: "900ms" }}
@@ -174,7 +174,7 @@ export function BootScpLogo({ onProceed }: BootScpLogoProps) {
         <button
           onClick={onProceed}
           disabled={lettersVisible < 3}
-          className={`mt-8 px-8 py-3 border-2 border-white/50 text-white text-sm tracking-[0.3em] font-bold
+          className={`mt-8 px-8 py-3 border-2 border-white/50 text-white text-[16px] tracking-[0.3em] font-bold
             hover:bg-white/10 hover:border-white transition-all duration-300
             ${lettersVisible >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           style={{ transitionDelay: "1.2s" }}

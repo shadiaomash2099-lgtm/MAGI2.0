@@ -45,7 +45,7 @@ export function ProposalPanel({
   return (
     <div className="flex flex-col h-full p-3 gap-3">
       {/* 标题 */}
-      <div className="text-[10px] font-bold tracking-widest text-amber-400/80">
+      <div className="text-[16px] font-bold tracking-widest text-amber-400/80">
         ▸ 提訴
       </div>
 
@@ -59,7 +59,7 @@ export function ProposalPanel({
 
       {/* 模型选择 */}
       <div className="flex flex-col gap-1">
-        <span className="text-[7px] text-gray-500 tracking-wider">模型分配</span>
+        <span className="text-[16px] text-gray-500 tracking-wider">模型分配</span>
         {ROLES.map((role) => (
           <ModelSelector
             key={role}

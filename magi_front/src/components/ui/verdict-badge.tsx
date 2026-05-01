@@ -38,7 +38,7 @@ export function VerdictBadge({ verdict }: VerdictBadgeProps) {
 
   return (
     <span
-      className={`inline-block px-1.5 py-0.5 text-[7px] font-bold border rounded-sm ${config.className}`}
+      className={`inline-block px-1.5 py-0.5 text-[16px] font-bold border rounded-sm ${config.className}`}
     >
       {config.label}
     </span>

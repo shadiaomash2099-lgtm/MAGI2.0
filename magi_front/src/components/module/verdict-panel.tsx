@@ -23,7 +23,7 @@ const ROLE_LABELS: Record<string, string> = {
 export function VerdictPanel({ units }: VerdictPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
-      <div className="text-[10px] font-bold tracking-widest text-amber-400/80">
+      <div className="text-[16px] font-bold tracking-widest text-amber-400/80">
         ▸ 決議
       </div>
 
@@ -33,7 +33,7 @@ export function VerdictPanel({ units }: VerdictPanelProps) {
             key={unit.role}
             className="flex items-center justify-between px-2 py-1.5 border border-amber-900/10 bg-black/20"
           >
-            <span className="text-[8px] font-bold tracking-wider text-amber-400/80">
+            <span className="text-[16px] font-bold tracking-wider text-amber-400/80">
               {ROLE_LABELS[unit.role]}
             </span>
             <VerdictBadge verdict={unit.verdict} />
@@ -42,7 +42,7 @@ export function VerdictPanel({ units }: VerdictPanelProps) {
       </div>
 
       {/* 状态摘要 */}
-      <div className="mt-auto text-[7px] text-gray-600">
+      <div className="mt-auto text-[16px] text-gray-600">
         {units.every((u) => u.verdict !== null)
           ? "全員表態完畢"
           : "等待表態中..."}

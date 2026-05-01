@@ -33,13 +33,13 @@ export function ModelSelector({
   onChange,
 }: ModelSelectorProps) {
   return (
-    <div className="flex items-center gap-1 text-[7px]">
+    <div className="flex items-center gap-1 text-[16px]">
       <span className="text-gray-500 shrink-0">{ROLE_LABELS[role]}:</span>
       <select
         value={value}
         onChange={(e) => onChange(role, e.target.value)}
         disabled={disabled}
-        className="flex-1 bg-transparent border border-amber-700/20 px-1 py-0.5 text-amber-400 outline-none focus:border-amber-700/40 transition-colors text-[7px]"
+        className="flex-1 bg-transparent border border-amber-700/20 px-1 py-0.5 text-amber-400 outline-none focus:border-amber-700/40 transition-colors text-[16px]"
       >
         {MODEL_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-gray-900">

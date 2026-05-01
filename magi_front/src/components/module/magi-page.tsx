@@ -142,7 +142,7 @@ export function MagiPage() {
           </div>
 
           {/* 底部状态栏 */}
-          <div className="flex items-center justify-between px-3 py-1 text-[7px] text-amber-400/30 tracking-widest border-t border-amber-900/15 shrink-0">
+          <div className="flex items-center justify-between px-3 py-1 text-[16px] text-amber-400/30 tracking-widest border-t border-amber-900/15 shrink-0">
             <span suppressHydrationWarning>
               SYS_STATUS: {sysStatus}
             </span>

@@ -56,7 +56,7 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
     >
       {/* 顶部信息栏 */}
       <div className={`flex items-center justify-between px-2 py-1 border-b shrink-0 ${colors.borderBottom}`}>
-        <span className={`text-[8px] font-bold tracking-widest ${colors.text}`}>
+        <span className={`text-[16px] font-bold tracking-widest ${colors.text}`}>
           {ROLE_LABELS[data.role] || data.role.toUpperCase()}
         </span>
         <div className={`absolute ${statusTopClass} top-1`}>
@@ -66,7 +66,7 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
 
       {/* 内容区 */}
       <div
-        className={`flex-1 overflow-y-auto p-2 text-[9px] leading-relaxed text-gray-300 scrollbar-thin markdown-content ${
+        className={`flex-1 overflow-y-auto p-2 text-[16px] leading-relaxed text-gray-300 scrollbar-thin markdown-content ${
           data.status === "speaking" ? "animate-lcl" : ""
         }`}
       >

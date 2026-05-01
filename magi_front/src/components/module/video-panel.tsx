@@ -17,7 +17,7 @@ interface VideoPanelProps {
 export function VideoPanel({ logLines }: VideoPanelProps) {
   return (
     <div className="flex flex-col h-full p-3 gap-2">
-      <div className="text-[10px] font-bold tracking-widest text-amber-400/80">
+      <div className="text-[16px] font-bold tracking-widest text-amber-400/80">
         ▸ 軍機處卷宗
       </div>
 

@@ -27,7 +27,7 @@ export function ControlButtons({
       <button
         onClick={onStart}
         disabled={isDebating || !topic.trim()}
-        className="px-3 py-1 text-[9px] font-bold tracking-wider border border-amber-700/30
+        className="px-3 py-1 text-[16px] font-bold tracking-wider border border-amber-700/30
                    text-amber-400 bg-amber-950/20 hover:bg-amber-950/40
                    disabled:opacity-30 disabled:cursor-not-allowed
                    transition-colors"
@@ -38,7 +38,7 @@ export function ControlButtons({
       <button
         onClick={onContinue}
         disabled={isDebating}
-        className="px-3 py-1 text-[9px] font-bold tracking-wider border border-amber-700/30
+        className="px-3 py-1 text-[16px] font-bold tracking-wider border border-amber-700/30
                    text-amber-400 bg-amber-950/20 hover:bg-amber-950/40
                    disabled:opacity-30 disabled:cursor-not-allowed
                    transition-colors"
@@ -49,7 +49,7 @@ export function ControlButtons({
       <button
         onClick={onSummarize}
         disabled={isDebating || isSummarized}
-        className="px-3 py-1 text-[9px] font-bold tracking-wider border border-amber-700/30
+        className="px-3 py-1 text-[16px] font-bold tracking-wider border border-amber-700/30
                    text-amber-400 bg-amber-950/20 hover:bg-amber-950/40
                    disabled:opacity-30 disabled:cursor-not-allowed
                    transition-colors"

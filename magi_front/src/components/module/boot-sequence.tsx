@@ -70,7 +70,7 @@ export function BootSequence({ onComplete }: BootSequenceProps) {
     <div className="col-start-1 row-start-1 col-span-full row-span-full z-50 bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
       {/* 跳过提示 */}
       {canSkip && (
-        <div className="absolute top-6 right-6 text-white/20 text-xs tracking-widest animate-pulse">
+        <div className="absolute top-6 right-6 text-white/20 text-[16px] tracking-widest animate-pulse">
           ESC 跳过
         </div>
       )}

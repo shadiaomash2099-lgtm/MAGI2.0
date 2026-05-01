@@ -33,7 +33,7 @@ export function LogViewer({ logLines }: LogViewerProps) {
   return (
     <div
       ref={containerRef}
-      className="h-full overflow-y-auto scrollbar-thin pr-1 space-y-0.5 text-[8px] leading-tight"
+      className="h-full overflow-y-auto scrollbar-thin pr-1 space-y-0.5 text-[16px] leading-relaxed"
     >
       {logLines.length === 0 && (
         <span className="text-gray-600 italic">等待系統日誌...</span>
