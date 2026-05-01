@@ -9,16 +9,16 @@
 //   grid-template-columns: 30.5% 1fr 30.5%
 //   grid-template-rows: 1fr 1fr
 //   grid-template-areas:
-//     "proposal  melchior  verdict"
+//     "verdict   melchior  proposal"
 //     "balthasar video     casper"
 //
 // 布局映射:
-//   proposal  → 左上: 提案面板 (30.5%)
-//   melchior  → 中上: 梅尔基奥尔 (39%) — 左右收缩到 0.75 倍
-//   verdict   → 右上: 表态面板 (30.5%)
-//   balthasar → 左下: 巴尔塔萨 (30.5%) — 向内衍生 1.5 倍
-//   video     → 中下: 系统日志 (39%)
-//   casper    → 右下: 卡斯帕 (30.5%) — 向内衍生 1.5 倍
+//   verdict   → 左上: 决议面板 (30.5%)
+//   melchior  → 中上: 梅尔基奥尔 (39%)
+//   proposal  → 右上: 提诉面板 (30.5%)
+//   balthasar → 左下: 巴尔塔萨 (30.5%)
+//   video     → 中下: 简略总结 (39%)
+//   casper    → 右下: 卡斯帕 (30.5%)
 // ============================================================
 
 "use client";
@@ -51,7 +51,7 @@ export function MagiGrid({
         gridTemplateColumns: "30.5% 1fr 30.5%",
         gridTemplateRows: "1fr 1fr",
         gridTemplateAreas: `
-          "proposal  melchior  verdict"
+          "verdict   melchior  proposal"
           "balthasar video     casper"
         `,
       }}
@@ -90,14 +90,14 @@ export function MagiGrid({
         </g>
       </svg>
 
-      <div style={{ gridArea: "proposal" }} className="relative overflow-hidden">
-        {proposal}
+      <div style={{ gridArea: "verdict" }} className="relative overflow-hidden">
+        {verdict}
       </div>
       <div style={{ gridArea: "melchior" }} className="relative overflow-hidden">
         {melchior}
       </div>
-      <div style={{ gridArea: "verdict" }} className="relative overflow-hidden">
-        {verdict}
+      <div style={{ gridArea: "proposal" }} className="relative overflow-hidden">
+        {proposal}
       </div>
       <div style={{ gridArea: "balthasar" }} className="relative overflow-hidden">
         {balthasar}

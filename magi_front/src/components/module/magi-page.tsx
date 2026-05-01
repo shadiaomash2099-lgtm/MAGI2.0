@@ -26,10 +26,12 @@ import { ProposalPanel } from "@/components/module/proposal-panel";
 import { VerdictPanel } from "@/components/module/verdict-panel";
 import { VideoPanel } from "@/components/module/video-panel";
 import { MagiUnit } from "@/components/module/magi-unit";
+import { ModelSelector } from "@/components/ui/model-selector";
 import { useDebateController } from "@/components/module/debate-controller";
 import { useDebateStore } from "@/store/debate-store";
 import { BootSequence } from "@/components/module/boot-sequence";
 import { NervHexBg } from "@/components/module/nerv-hex-bg";
+import type { MagiRole } from "@/types";
 
 // 三贤人 clipPath 切角（NERV 风格）
 const CLIP_PATHS = {
@@ -40,7 +42,6 @@ const CLIP_PATHS = {
 
 export function MagiPage() {
   const [bootComplete, setBootComplete] = useState(false);
-  const [sysStatus, setSysStatus] = useState("INITIALIZING");
   const [blink, setBlink] = useState(true);
   const controller = useDebateController();
   const logLines = useDebateStore((s) => s.logLines);
@@ -53,20 +54,8 @@ export function MagiPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // 根据辩论状态更新系统状态
-  useEffect(() => {
-    if (controller.isDebating) {
-      setSysStatus("DEBATE_ACTIVE");
-    } else if (controller.isSummarized) {
-      setSysStatus("SUMMARY_COMPLETE");
-    } else if (bootComplete) {
-      setSysStatus("STANDBY");
-    }
-  }, [controller.isDebating, controller.isSummarized, bootComplete]);
-
   const handleBootComplete = useCallback(() => {
     setBootComplete(true);
-    setSysStatus("STANDBY");
   }, []);
 
   return (
@@ -97,10 +86,8 @@ export function MagiPage() {
                     topic={controller.topic}
                     isDebating={controller.isDebating}
                     isSummarized={controller.isSummarized}
-                    modelChoice={controller.modelChoice}
                     onTopicChange={controller.setTopic}
                     onTopicKeyDown={controller.handleTopicKeyDown}
-                    onModelChange={controller.handleModelChange}
                     onStart={controller.startDebate}
                     onContinue={controller.continueDebate}
                     onSummarize={controller.handleSummarize}
@@ -111,7 +98,14 @@ export function MagiPage() {
                     data={units[0]}
                     clipPath={CLIP_PATHS.melchior}
                     statusPos="top-right"
-                  />
+                  >
+                    <ModelSelector
+                      role={"melchior" as MagiRole}
+                      value={controller.modelChoice["melchior"] || ""}
+                      disabled={controller.isDebating}
+                      onChange={controller.handleModelChange}
+                    />
+                  </MagiUnit>
                 }
                 verdict={<VerdictPanel units={units} />}
                 balthasar={
@@ -119,7 +113,14 @@ export function MagiPage() {
                     data={units[1]}
                     clipPath={CLIP_PATHS.balthasar}
                     statusPos="top-left"
-                  />
+                  >
+                    <ModelSelector
+                      role={"balthasar" as MagiRole}
+                      value={controller.modelChoice["balthasar"] || ""}
+                      disabled={controller.isDebating}
+                      onChange={controller.handleModelChange}
+                    />
+                  </MagiUnit>
                 }
                 video={<VideoPanel logLines={logLines} />}
                 casper={
@@ -127,7 +128,14 @@ export function MagiPage() {
                     data={units[2]}
                     clipPath={CLIP_PATHS.casper}
                     statusPos="top-right"
-                  />
+                  >
+                    <ModelSelector
+                      role={"casper" as MagiRole}
+                      value={controller.modelChoice["casper"] || ""}
+                      disabled={controller.isDebating}
+                      onChange={controller.handleModelChange}
+                    />
+                  </MagiUnit>
                 }
               />
             </div>
@@ -142,10 +150,7 @@ export function MagiPage() {
           </div>
 
           {/* 底部状态栏 */}
-          <div className="flex items-center justify-between px-3 py-1 text-[16px] text-amber-400/30 tracking-widest border-t border-amber-900/15 shrink-0">
-            <span suppressHydrationWarning>
-              SYS_STATUS: {sysStatus}
-            </span>
+          <div className="flex items-center justify-end px-3 py-1 text-[16px] text-amber-400/30 tracking-widest border-t border-amber-900/15 shrink-0">
             <span
               className={blink ? "opacity-60" : "opacity-0"}
               suppressHydrationWarning

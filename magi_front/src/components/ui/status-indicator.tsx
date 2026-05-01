@@ -16,7 +16,7 @@ const STATUS_CONFIG: Record<
   { label: string; className: string }
 > = {
   idle: {
-    label: "STANDBY",
+    label: "",
     className: "text-cyan-400/70",
   },
   thinking: {
@@ -35,6 +35,9 @@ const STATUS_CONFIG: Record<
 
 export function StatusIndicator({ status }: StatusIndicatorProps) {
   const config = STATUS_CONFIG[status];
+
+  // idle 状态不显示任何内容（去掉 STANDBY 和小箭头）
+  if (status === "idle") return null;
 
   return (
     <span className={`text-[16px] font-bold tracking-wider ${config.className}`}>

@@ -27,9 +27,9 @@ interface MagiUnitProps {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-  melchior: "MELCHIOR·1 — 科學家的視點",
-  balthasar: "BALTHASAR·2 — 母性的視點",
-  casper: "CASPER·3 — 女人的視點",
+  melchior: "MELCHIOR",
+  balthasar: "BALTHASAR",
+  casper: "CASPER",
 };
 
 /** 根据状态返回颜色类名：idle/done→天蓝色实底, thinking/speaking→LCL黄色实底 */
@@ -49,17 +49,24 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
     statusPos === "top-right" ? "right-2" : "left-2";
   const colors = statusColors(data.status);
 
+  // Casper 切角在左上角（polygon(12% 0%, ...)），flex-row-reverse 让角色名和模型选择器移到右侧避开切角
+  const isCasper = data.role === "casper";
+
   return (
     <div
       className={`relative w-full h-full flex flex-col border ${colors.bg} ${colors.border}`}
       style={{ clipPath }}
     >
-      {/* 顶部信息栏 */}
-      <div className={`flex items-center justify-between px-2 py-1 border-b shrink-0 ${colors.borderBottom}`}>
-        <span className={`text-[16px] font-bold tracking-widest ${colors.text}`}>
+      {/* 顶部信息栏: 角色名 + 模型选择器 + 状态指示器 */}
+      {/* Casper 使用 flex-row-reverse：视觉上 [角色名] [模型选择器] [状态指示器] 从右到左，避开左上切角 */}
+      <div className={`flex ${isCasper ? "flex-row-reverse" : "flex-row"} items-center gap-2 px-2 py-1 border-b shrink-0 ${colors.borderBottom}`}>
+        <span className={`text-[16px] font-bold tracking-widest shrink-0 ${colors.text}`}>
           {ROLE_LABELS[data.role] || data.role.toUpperCase()}
         </span>
-        <div className={`absolute ${statusTopClass} top-1`}>
+        <div className="flex-1 min-w-0">
+          {children}
+        </div>
+        <div className={`shrink-0 ${statusTopClass}`}>
           <StatusIndicator status={data.status} />
         </div>
       </div>
@@ -83,10 +90,9 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
         )}
       </div>
 
-      {/* 底部: 表态徽章 + 自定义内容 */}
+      {/* 底部: 表态徽章 */}
       <div className={`flex items-center gap-2 px-2 py-1 border-t shrink-0 ${colors.borderTop}`}>
         <VerdictBadge verdict={data.verdict} />
-        {children}
       </div>
     </div>
   );
