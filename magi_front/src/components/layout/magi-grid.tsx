@@ -44,7 +44,7 @@ export function MagiGrid({
 }: MagiGridProps) {
   return (
     <div
-      className="w-full h-full min-h-screen px-8 pt-4 pb-16"
+      className="w-full h-full px-8 pt-4 pb-4"
       style={{
         display: "grid",
         gap: "4px",

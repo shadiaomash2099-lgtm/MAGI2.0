@@ -34,26 +34,26 @@ export function ProposalPanel({
   onSummarize,
 }: ProposalPanelProps) {
   return (
-    <div className="flex flex-col h-full p-3 gap-3">
+    <div className="flex flex-col h-full p-2 gap-2">
       {/* NERV 红色警告标题 — 斜向切割条纹 */}
-      <div className="relative py-1.5 text-center">
+      <div className="relative py-1 text-center">
         {/* 上条纹（z-index 高于 CRT 扫描线） */}
         <div
-          className="absolute top-0 left-0 right-0 h-[6px]"
+          className="absolute top-0 left-0 right-0 h-[4px]"
           style={{
             zIndex: 20,
-            background: `repeating-linear-gradient(-45deg, #b91c1c 0px, #b91c1c 8px, transparent 8px, transparent 14px)`,
+            background: `repeating-linear-gradient(-45deg, #b91c1c 0px, #b91c1c 6px, transparent 6px, transparent 11px)`,
           }}
         />
         {/* 下条纹（z-index 高于 CRT 扫描线） */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-[6px]"
+          className="absolute bottom-0 left-0 right-0 h-[4px]"
           style={{
             zIndex: 20,
-            background: `repeating-linear-gradient(135deg, #b91c1c 0px, #b91c1c 8px, transparent 8px, transparent 14px)`,
+            background: `repeating-linear-gradient(135deg, #b91c1c 0px, #b91c1c 6px, transparent 6px, transparent 11px)`,
           }}
         />
-        <div className="text-[32px] font-bold tracking-[-0.05em] text-magi-nerv-red-bright">
+        <div className="text-[28px] font-bold tracking-[-0.05em] text-magi-nerv-red-bright">
           提訴
         </div>
       </div>

@@ -32,15 +32,21 @@ const ROLE_LABELS: Record<string, string> = {
   casper: "CASPER",
 };
 
-/** 根据状态返回颜色类名：idle/done→天蓝色实底, thinking/speaking→LCL黄色实底 */
+/** 根据状态返回颜色类名：
+ *  - idle/done → 天蓝色实底（默认等待/完成）
+ *  - thinking  → 蓝色系（等待发言，非活跃）
+ *  - speaking  → 亮黄色实底（正在输出，活跃）
+ */
 function statusColors(status: string) {
-  const isActive = status === "thinking" || status === "speaking";
+  const isSpeaking = status === "speaking";
+  const isThinking = status === "thinking";
   return {
-    bg: isActive ? "bg-amber-900" : "bg-cyan-900",
-    border: isActive ? "border-amber-700/30" : "border-cyan-700/25",
-    borderBottom: isActive ? "border-amber-700/15" : "border-cyan-700/10",
-    borderTop: isActive ? "border-amber-700/15" : "border-cyan-700/10",
-    text: isActive ? "text-amber-400/80" : "text-cyan-400/70",
+    // speaking 的背景色由 animate-lcl 动画接管，此处不设固定 bg 类
+    bg: isSpeaking ? "" : isThinking ? "bg-cyan-800" : "bg-cyan-900",
+    border: isSpeaking ? "border-amber-500/50" : isThinking ? "border-cyan-600/30" : "border-cyan-700/25",
+    borderBottom: isSpeaking ? "border-amber-500/30" : isThinking ? "border-cyan-600/15" : "border-cyan-700/10",
+    borderTop: isSpeaking ? "border-amber-500/30" : isThinking ? "border-cyan-600/15" : "border-cyan-700/10",
+    text: isSpeaking ? "text-amber-300/90" : isThinking ? "text-cyan-300/80" : "text-cyan-400/70",
   };
 }
 
@@ -63,7 +69,9 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
 
   return (
     <div
-      className={`relative w-full h-full flex flex-col border ${colors.bg} ${colors.border}`}
+      className={`relative w-full h-full flex flex-col border ${colors.bg} ${colors.border} ${
+        data.status === "speaking" ? "animate-lcl" : ""
+      }`}
       style={{ clipPath }}
     >
       {/* 顶部信息栏: 角色名 + 模型选择器 + 状态指示器 */}
@@ -83,8 +91,8 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
       {/* 内容区 — 根据切角位置调整 padding，避免内容被切角遮挡 */}
       <div
         className={`flex-1 overflow-y-auto text-[16px] leading-relaxed text-gray-300 scrollbar-thin markdown-content ${
-          data.status === "speaking" ? "animate-lcl" : ""
-        } ${isCasper ? "pl-[14%] pr-2 pt-2 pb-2" : isBalthasar ? "pr-[14%] pl-2 pt-2 pb-2" : "p-2"}`}
+          isCasper ? "pl-[14%] pr-2 pt-2 pb-2" : isBalthasar ? "pr-[14%] pl-2 pt-2 pb-2" : "p-2"
+        }`}
       >
         {data.content ? (
           <ReactMarkdown remarkPlugins={[remarkGfm]}>

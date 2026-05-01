@@ -78,7 +78,7 @@ export function ControlButtons({
       <div
         ref={logContainerRef}
         className="flex-1 min-h-0 overflow-y-auto scrollbar-thin border border-amber-900/15 rounded-sm
-                   bg-black/40 p-2 space-y-0.5 text-[18px] leading-relaxed font-mono"
+                   bg-black/40 p-1.5 space-y-0.5 text-[16px] leading-snug font-mono"
       >
         {logLines.length === 0 ? (
           <span className="text-gray-600 italic">等待系統日誌...</span>
