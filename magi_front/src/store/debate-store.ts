@@ -41,6 +41,8 @@ export interface DebateState {
   modelChoice: Record<string, string>;
   /** 是否已总结 */
   isSummarized: boolean;
+  /** 是否正在生成总结（控制呼吸动画） */
+  isSummarizing: boolean;
   /** 当前发言角色 */
   currentSpeaker: MagiRole | null;
   /** 简明总结文本（点击总结后生成） */
@@ -51,6 +53,7 @@ export interface DebateState {
   setTopic: (topic: string) => void;
   setDebating: (debating: boolean) => void;
   setSummarized: (summarized: boolean) => void;
+  setSummarizing: (summarizing: boolean) => void;
   setModelChoice: (choice: Record<string, string>) => void;
   setCurrentSpeaker: (role: MagiRole | null) => void;
 
@@ -88,6 +91,7 @@ export const useDebateStore = create<DebateState>((set) => ({
   topic: "",
   modelChoice: {},
   isSummarized: false,
+  isSummarizing: false,
   currentSpeaker: null,
   summaryText: "",
 
@@ -99,6 +103,7 @@ export const useDebateStore = create<DebateState>((set) => ({
   setDebating: (debating) => set({ isDebating: debating }),
 
   setSummarized: (summarized) => set({ isSummarized: summarized }),
+  setSummarizing: (summarizing) => set({ isSummarizing: summarizing }),
 
   setModelChoice: (choice) => set({ modelChoice: choice }),
 
@@ -165,6 +170,7 @@ export const useDebateStore = create<DebateState>((set) => ({
       logLines: [],
       isDebating: false,
       isSummarized: false,
+      isSummarizing: false,
       topic: "",
       currentSpeaker: null,
       summaryText: "",

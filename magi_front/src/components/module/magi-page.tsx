@@ -50,6 +50,7 @@ export function MagiPage() {
   const currentSpeaker = useDebateStore((s) => s.currentSpeaker);
   const summaryText = useDebateStore((s) => s.summaryText);
   const isSummarized = useDebateStore((s) => s.isSummarized);
+  const isSummarizing = useDebateStore((s) => s.isSummarizing);
 
   // 光标闪烁
   useEffect(() => {
@@ -144,7 +145,7 @@ export function MagiPage() {
                     />
                   </MagiUnit>
                 }
-                video={<VideoPanel summaryText={summaryText} isSummarized={isSummarized} />}
+                video={<VideoPanel summaryText={summaryText} isSummarized={isSummarized} isSummarizing={isSummarizing} onTypingComplete={controller.handleTypingComplete} />}
                 casper={
                   <MagiUnit
                     data={units[2]}

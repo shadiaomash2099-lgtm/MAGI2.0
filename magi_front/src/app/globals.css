@@ -249,6 +249,26 @@
   animation: lcl-breathe 2s ease-in-out infinite;
 }
 
+/* ─── 总结面板呼吸动画 ──────────────────────────────────── */
+@keyframes summary-breathe {
+  0%, 100% {
+    background-color: oklch(0.15 0.06 75 / 0.4);
+    box-shadow:
+      0 0 8px 2px oklch(0.7 0.22 80 / 0.15),
+      inset 0 0 8px 2px oklch(0.7 0.22 80 / 0.05);
+  }
+  50% {
+    background-color: oklch(0.25 0.10 75 / 0.5);
+    box-shadow:
+      0 0 20px 6px oklch(0.7 0.22 80 / 0.35),
+      inset 0 0 16px 6px oklch(0.7 0.22 80 / 0.10);
+  }
+}
+
+.animate-lcl-summary {
+  animation: summary-breathe 1.8s ease-in-out infinite;
+}
+
 /* ─── 启动画面 ─────────────────────────────────────────── */
 @keyframes boot-sequence {
   0% { opacity: 0; }

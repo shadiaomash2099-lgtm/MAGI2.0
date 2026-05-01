@@ -33,6 +33,7 @@ export function useDebateController() {
     setTopic,
     setDebating,
     setSummarized,
+    setSummarizing,
     setModelChoice,
     appendUnitContent,
     setUnitStatus,
@@ -190,20 +191,39 @@ export function useDebateController() {
     if (!debateHistoryRef.current) return;
 
     addLog("sys", "正在生成总结...");
+    setSummarizing(true);
 
     try {
       const result = await fetchSummary(
         debateHistoryRef.current,
         topicRef.current
       );
-      // 只使用简明总结文本，不设置各贤人单独的观点总结
-      setSummaryText(result.summary);
+      // 将 JSON 格式化为显示文本：summary + 各贤人观点（带加粗标记）
+      const nameMap: Record<string, string> = {
+        melchior: "梅爾基奧",
+        balthasar: "巴爾薩澤",
+        casper: "卡斯珀",
+      };
+      const parts: string[] = [result.summary];
+      for (const role of ["melchior", "balthasar", "casper"] as const) {
+        if (result[role]) {
+          parts.push(`\n【${nameMap[role]}】\n${result[role]}`);
+        }
+      }
+      setSummaryText(parts.join("\n"));
       setSummarized(true);
+      // 呼吸动画由 VideoPanel 的 onTypingComplete 回调关闭
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "未知错误";
       addLog("sys", `【總結失敗】${msg}`);
+      setSummarizing(false);
     }
-  }, [addLog, setSummarized, setSummaryText]);
+  }, [addLog, setSummarized, setSummarizing, setSummaryText]);
+
+  // 打字完成后关闭呼吸动画
+  const handleTypingComplete = useCallback(() => {
+    setSummarizing(false);
+  }, [setSummarizing]);
 
   // ── 话题输入处理 ─────────────────────────────────────────
   const handleTopicKeyDown = useCallback(
@@ -237,6 +257,7 @@ export function useDebateController() {
     startDebate,
     continueDebate,
     handleSummarize,
+    handleTypingComplete,
     handleTopicKeyDown,
     handleModelChange,
   };

@@ -52,7 +52,9 @@ export interface DebateParams {
 /** 总结结果（匹配 backend/main.py summarize 返回） */
 export interface SummaryResult {
   summary: string;
-  verdicts: Record<string, string>;
+  melchior: string;
+  balthasar: string;
+  casper: string;
 }
 
 // ─── 贤人单元 ──────────────────────────────────────────────

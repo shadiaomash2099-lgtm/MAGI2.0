@@ -127,7 +127,7 @@ async def stream_debate(request: DebateRequest):
 async def summarize(request: SummarizeRequest):
     """
     军机处卷宗整理：接收辩论历史，调用 AI 生成结构化总结。
-    返回 JSON: { summary: str, verdicts: { melchior: str, balthasar: str, casper: str } }
+    返回 JSON: { summary: str, melchior: str, balthasar: str, casper: str }
     """
     # 组装给 AI 的输入：议题 + 辩论历史
     input_text = f"议题：{request.topic}\n\n辩论记录：\n{request.history}"
@@ -147,29 +147,23 @@ async def summarize(request: SummarizeRequest):
             cleaned = "\n".join(lines)
 
         parsed = json.loads(cleaned)
-        # 将总结和表态内容转换为香港繁体
-        if "summary" in parsed:
-            parsed["summary"] = to_hk_traditional(parsed["summary"])
-        if "verdicts" in parsed:
-            for role in parsed["verdicts"]:
-                parsed["verdicts"][role] = to_hk_traditional(parsed["verdicts"][role])
+        # 将总结内容转换为香港繁体
+        for key in ("summary", "melchior", "balthasar", "casper"):
+            if key in parsed:
+                parsed[key] = to_hk_traditional(parsed[key])
         return parsed
     except json.JSONDecodeError:
         # 如果 AI 返回的不是合法 JSON，返回错误信息
         return {
             "summary": to_hk_traditional(result),
-            "verdicts": {
-                "melchior": to_hk_traditional("总结生成失败：AI 返回格式异常"),
-                "balthasar": to_hk_traditional("总结生成失败：AI 返回格式异常"),
-                "casper": to_hk_traditional("总结生成失败：AI 返回格式异常")
-            }
+            "melchior": to_hk_traditional("总结生成失败：AI 返回格式异常"),
+            "balthasar": to_hk_traditional("总结生成失败：AI 返回格式异常"),
+            "casper": to_hk_traditional("总结生成失败：AI 返回格式异常")
         }
     except Exception as e:
         return {
             "summary": to_hk_traditional(f"总结生成失败：{str(e)}"),
-            "verdicts": {
-                "melchior": to_hk_traditional(f"总结生成失败：{str(e)}"),
-                "balthasar": to_hk_traditional(f"总结生成失败：{str(e)}"),
-                "casper": to_hk_traditional(f"总结生成失败：{str(e)}")
-            }
+            "melchior": to_hk_traditional(f"总结生成失败：{str(e)}"),
+            "balthasar": to_hk_traditional(f"总结生成失败：{str(e)}"),
+            "casper": to_hk_traditional(f"总结生成失败：{str(e)}")
         }
