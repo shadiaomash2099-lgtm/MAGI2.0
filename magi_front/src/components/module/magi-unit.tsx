@@ -51,7 +51,7 @@ export function MagiUnit({ data, clipPath, statusPos, children }: MagiUnitProps)
 
   return (
     <div
-      className={`relative w-full h-full flex flex-col border crt-screen ${colors.bg} ${colors.border}`}
+      className={`relative w-full h-full flex flex-col border ${colors.bg} ${colors.border}`}
       style={{ clipPath }}
     >
       {/* 顶部信息栏 */}

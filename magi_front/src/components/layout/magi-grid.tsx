@@ -44,9 +44,10 @@ export function MagiGrid({
 }: MagiGridProps) {
   return (
     <div
-      className="w-full h-full min-h-screen"
+      className="w-full h-full min-h-screen p-8"
       style={{
         display: "grid",
+        gap: "4px",
         gridTemplateColumns: "24% 1fr 24%",
         gridTemplateRows: "1fr 1fr",
         gridTemplateAreas: `
@@ -55,12 +56,12 @@ export function MagiGrid({
         `,
       }}
     >
-      {/* SVG 连接线 — 覆盖在 Grid 之上，使用 grid-area 跨越所有单元格 */}
+      {/* SVG 连接线 — 绘制在 Grid 单元格背景之下，使用 grid-area 跨越所有单元格 */}
       <svg
-        className="pointer-events-none z-10 w-full h-full opacity-30"
+        className="pointer-events-none w-full h-full opacity-30"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{ gridArea: "1 / 1 / -1 / -1", mixBlendMode: "screen" }}
+        style={{ gridArea: "1 / 1 / -1 / -1", zIndex: -1 }}
       >
         <g stroke="var(--magi-amber, #c0843c)" strokeWidth="0.3" fill="none">
           {/* Melchior(中上) → Balthasar(左下) */}
