@@ -16,7 +16,7 @@
 
 import { useCallback, useRef } from "react";
 import { useDebateStore } from "@/store/debate-store";
-import { streamDebate, fetchSummary, fetchUnitSummary } from "@/lib/api";
+import { streamDebate, fetchSummary } from "@/lib/api";
 import type { MagiRole, SseData, Verdict } from "@/types";
 
 /**
@@ -37,7 +37,6 @@ export function useDebateController() {
     appendUnitContent,
     setUnitStatus,
     setUnitVerdict,
-    setUnitSummary,
     setCurrentSpeaker,
     resetUnits,
     addLog,
@@ -50,8 +49,6 @@ export function useDebateController() {
   const abortRef = useRef<AbortController | null>(null);
   const topicRef = useRef(topic);
   const debateHistoryRef = useRef("");
-  const summarizedRolesRef = useRef<Set<string>>(new Set());
-
   // 保持 topicRef 同步
   topicRef.current = topic;
 
@@ -122,31 +119,7 @@ export function useDebateController() {
       })
       .join("\n");
     debateHistoryRef.current = `初始議題：${topicRef.current}\n\n${fullLog}`;
-
-    // 为每个已发言但未总结的角色生成观点总结
-    const lastSpeaker = useDebateStore.getState().currentSpeaker;
-    if (lastSpeaker && !summarizedRolesRef.current.has(lastSpeaker)) {
-      summarizedRolesRef.current.add(lastSpeaker);
-      const lastContent = state.logLines
-        .filter((log) => log.role === lastSpeaker && log.content)
-        .map((log) => log.content)
-        .join("\n");
-      if (lastContent.trim()) {
-        fetchUnitSummary({
-          role: lastSpeaker,
-          content: lastContent,
-          topic: topicRef.current,
-        })
-          .then((res) => {
-            setUnitSummary(lastSpeaker, res.summary);
-            if (res.verdict) {
-              setUnitVerdict(lastSpeaker, res.verdict as Verdict);
-            }
-          })
-          .catch((err) => console.warn(`[${lastSpeaker}] 观点总结失败:`, err));
-      }
-    }
-  }, [setDebating, setCurrentSpeaker, addLog, setUnitSummary, setUnitVerdict]);
+  }, [setDebating, setCurrentSpeaker]);
 
   // ── 处理错误 ─────────────────────────────────────────────
   const handleError = useCallback(
@@ -164,7 +137,6 @@ export function useDebateController() {
     if (!topic.trim()) return;
 
     resetAll();
-    summarizedRolesRef.current = new Set();
     debateHistoryRef.current = "";
     setDebating(true);
     setSummarized(false);
@@ -193,7 +165,6 @@ export function useDebateController() {
 
     // 清除上一轮的三贤人内容和表态，重新开始
     resetUnits();
-    summarizedRolesRef.current = new Set();
     setDebating(true);
     addLog("sys", "收到用户锦囊，基于历史战报开启新一轮推演...");
 
@@ -225,22 +196,14 @@ export function useDebateController() {
         debateHistoryRef.current,
         topicRef.current
       );
+      // 只使用简明总结文本，不设置各贤人单独的观点总结
       setSummaryText(result.summary);
       setSummarized(true);
-
-      // 更新各贤人的表态
-      if (result.verdicts) {
-        (Object.entries(result.verdicts) as [MagiRole, string][]).forEach(
-          ([role, verdict]) => {
-            setUnitVerdict(role, verdict as Verdict);
-          }
-        );
-      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "未知错误";
       addLog("sys", `【總結失敗】${msg}`);
     }
-  }, [addLog, setSummarized, setUnitVerdict, setSummaryText]);
+  }, [addLog, setSummarized, setSummaryText]);
 
   // ── 话题输入处理 ─────────────────────────────────────────
   const handleTopicKeyDown = useCallback(

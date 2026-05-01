@@ -6,8 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import json
 import re
-
-from backend.prompts import MELCHIOR_PROMPT, BALTHASAR_PROMPT, CASPER_PROMPT, SUMMARIZE_PROMPT, UNIT_SUMMARIZE_PROMPT
+from backend.prompts import MELCHIOR_PROMPT, BALTHASAR_PROMPT, CASPER_PROMPT, SUMMARIZE_PROMPT
 from backend.agent_core import stream_call_agent, _call_agent
 from backend.translator import to_hk_traditional
 
@@ -34,11 +33,6 @@ class DebateRequest(BaseModel):
 
 class SummarizeRequest(BaseModel):
     history: str            # 辩论历史文本
-    topic: str              # 原议题
-
-class UnitSummarizeRequest(BaseModel):
-    role: str               # 角色名称（melchior/balthasar/casper）
-    content: str            # 该角色的完整发言内容
     topic: str              # 原议题
 
 class HealthCheckRequest(BaseModel):
@@ -178,63 +172,4 @@ async def summarize(request: SummarizeRequest):
                 "balthasar": to_hk_traditional(f"总结生成失败：{str(e)}"),
                 "casper": to_hk_traditional(f"总结生成失败：{str(e)}")
             }
-        }
-
-# ─── 单角色观点总结 API ───
-
-@app.post("/api/summarize_unit")
-async def summarize_unit(request: UnitSummarizeRequest):
-    """
-    军机处幕僚：为单个角色生成其核心观点的 Markdown 摘要。
-    使用 DeepSeek API 生成，确保观点提炼准确。
-    """
-    # 角色中文名映射
-    role_names = {
-        "melchior": "梅尔基奧爾（絕對理性與結構主義者）",
-        "balthasar": "巴爾塔薩（倫理邊界與長期防護者）",
-        "casper": "卡斯帕（先鋒解構與直覺行者）",
-    }
-    role_name = role_names.get(request.role, request.role)
-    
-    # 组装 prompt
-    prompt = UNIT_SUMMARIZE_PROMPT.format(
-        role=role_name,
-        topic=request.topic,
-        content=request.content,
-    )
-    
-    try:
-        # 使用 DeepSeek 生成观点总结
-        result = _call_agent(request.role, prompt, request.topic, "lite", "DeepSeek 轻量")
-        cleaned = result.strip()
-        # 移除可能的 markdown 代码块标记
-        if cleaned.startswith("```"):
-            lines = cleaned.split("\n")
-            if lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines and lines[-1].strip() == "```":
-                lines = lines[:-1]
-            cleaned = "\n".join(lines)
-        
-        # 解析 [VERDICT] 标记，提取最终倾向
-        import re
-        verdict_match = re.search(r'\[VERDICT\](承认|否认|疑虑)', cleaned)
-        verdict = None
-        if verdict_match:
-            verdict = verdict_match.group(1)
-            # 从 summary 中移除 [VERDICT] 行
-            cleaned = re.sub(r'\s*\[VERDICT\](承认|否认|疑虑)\s*', '', cleaned).strip()
-        
-        # 清理 AI 可能输出的"第一步："、"第二步："等序号引导文字
-        cleaned = re.sub(r'^(第一步|第二步|第[一二三四五六七八九十]步)[：:]\s*', '', cleaned, flags=re.MULTILINE)
-        cleaned = cleaned.strip()
-        
-        return {
-            "summary": to_hk_traditional(cleaned),
-            "verdict": to_hk_traditional(verdict) if verdict else None,
-        }
-    except Exception as e:
-        return {
-            "summary": to_hk_traditional(f"**觀點提煉失敗**：{str(e)}"),
-            "verdict": None,
         }

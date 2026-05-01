@@ -17,8 +17,6 @@ import type {
   SseData,
   DebateParams,
   SummaryResult,
-  UnitSummaryRequest,
-  UnitSummaryResult,
 } from "@/types";
 
 // ─── 配置 ───────────────────────────────────────────────────
@@ -123,26 +121,6 @@ export async function fetchSummary(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ history, topic }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-// ─── 单贤人总结 API ────────────────────────────────────────
-/**
- * 请求 AI 生成单个角色的观点总结
- */
-export async function fetchUnitSummary(
-  params: UnitSummaryRequest
-): Promise<UnitSummaryResult> {
-  const response = await fetch(`${API_BASE}/api/summarize_unit`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
   });
 
   if (!response.ok) {

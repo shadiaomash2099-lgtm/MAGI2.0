@@ -55,19 +55,6 @@ export interface SummaryResult {
   verdicts: Record<string, string>;
 }
 
-/** 单贤人总结请求（匹配 backend/main.py UnitSummarizeRequest） */
-export interface UnitSummaryRequest {
-  role: string;
-  content: string;
-  topic: string;
-}
-
-/** 单贤人总结结果（匹配 backend/main.py summarize_unit 返回） */
-export interface UnitSummaryResult {
-  summary: string;
-  verdict?: string | null;
-}
-
 // ─── 贤人单元 ──────────────────────────────────────────────
 
 /** 单个贤人单元数据 */
